@@ -1,0 +1,11 @@
+{
+    "recommendations": [
+        "editorconfig.editorconfig",
+        "esbenp.prettier-vscode",
+        "ms-python.python",
+        "ms-python.black-formatter",
+        "vue.volar",
+        "wayou.vscode-todo-highlight",
+        "streetsidesoftware.code-spell-checker"
+    ]
+}
