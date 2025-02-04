@@ -1,8 +1,8 @@
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-
-from open_api import some_function
+from services.text_correction import TextCorrectionService, TextCorrectionOptions
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -16,18 +16,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
-async def read_root():
-    return {"message": "Welcome to the API"}
+text_correction_service = TextCorrectionService()
 
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello, {name}!"}
+class ChatPrompt(BaseModel):
+    text: str
 
-@app.get("/test")
-def chat_completions():
-    response = some_function()
-    return { "response": response }
+@app.post("/text-correction")
+def chat_completions(text: ChatPrompt):
+    result = text_correction_service.correct_text(text.text, TextCorrectionOptions())
 
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=3000, reload=True)
+    if result.is_left():
+        raise HTTPException(status_code=400, detail=result.left())
+    return result.right()

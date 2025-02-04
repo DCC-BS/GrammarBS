@@ -16,7 +16,7 @@ docker run -d `
     -v "${env:HUGGING_FACE_CACHE_DIR}:/root/.cache/huggingface" `
     --env "HUGGING_FACE_HUB_TOKEN=${env:HUGGING_FACE_HUB_TOKEN}" `
     --env "VLLM_ATTENTION_BACKEND=FLASHINFER" `
-    -p "${env:API_PORT}:8000" `
+    -p "${env:LLM_API_PORT}:8000" `
     --ipc=host `
     vllm/vllm-openai:v0.7.0 `
     --port 8000 `

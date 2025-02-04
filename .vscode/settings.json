@@ -1,6 +1,8 @@
 {
     "editor.renderWhitespace": "all",
-    "editor.rulers": [100],
+    "editor.rulers": [
+        100
+    ],
     "files.trimTrailingWhitespace": true,
     "files.insertFinalNewline": true,
     "editor.tabSize": 4,
@@ -10,14 +12,23 @@
     "editor.renderControlCharacters": true,
     "[python]": {
         "editor.formatOnSave": true,
-        "editor.defaultFormatter": "ms-python.black-formatter"
+        "editor.defaultFormatter": "ms-python.python"
     },
     "[typescript]": {
         "editor.formatOnSave": true,
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
+        "editor.defaultFormatter": "vscode.typescript-language-features"
     },
     "[vue]": {
         "editor.formatOnSave": true,
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    }
+        "editor.defaultFormatter": "Vue.volar"
+    },
+    "python.analysis.typeCheckingMode": "strict",
+    "python.languageServer": "None",
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/api"
+    ],
+    "basedpyright.analysis.extraPaths": [
+        "${workspaceFolder}/api"
+    ],
+    "basedpyright.analysis.typeCheckingMode": "basic"
 }
