@@ -1,10 +1,3 @@
-[tool.pyright]
-venvPath = "."
-pythonPath = "python"
-pythonVersion = "3.13"
-include = ["api"]
-extraPaths = ["."]
-
 [project]
 name = "api"
 version = "0.1.0"
@@ -12,23 +5,50 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "dspy>=2.6.2",
     "fastapi[standard]>=0.115.8",
     "mypy>=1.14.1",
     "openai>=1.61.0",
     "python-dotenv>=1.0.1",
+    "requests>=2.32.3",
+    "types-requests>=2.32.0.20241016",
     "types-setuptools>=75.8.0.20250110",
 ]
 
-[tool.black]
-line-length = 88
-target-version = ['py39']
-include = '\.pyi?$'
-
-[tool.isort]
-profile = "black"
-multi_line_output = 3
-line_length = 88
-
 [tool.ruff]
-line-length = 88
+# Same as Black.
+line-length = 120
 indent-width = 4
+
+# Assume Python 3.12
+target-version = "py312"
+
+[tool.ruff.lint]
+# Add rules to enable
+select = [
+    "E",   # pycodestyle
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+]
+
+# Ignore specific rules
+ignore = []
+
+[tool.ruff.format]
+# Use double quotes for strings.
+quote-style = "double"
+
+# Indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Automatically detect the appropriate line ending.
+line-ending = "auto"
+
+[tool.ruff.lint.isort]
+# Group imports by type (standard library, third-party, first-party).
+combine-as-imports = true
+force-wrap-aliases = true

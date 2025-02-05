@@ -1,6 +1,8 @@
 {
     "editor.renderWhitespace": "all",
-    "editor.rulers": [88],
+    "editor.rulers": [
+        88
+    ],
     "files.trimTrailingWhitespace": true,
     "files.insertFinalNewline": true,
     "editor.tabSize": 4,
@@ -8,6 +10,8 @@
     "editor.detectIndentation": false,
     "[python]": {
         "editor.formatOnSave": true,
-        "editor.defaultFormatter": "ms-python.black-formatter"
-    }
-} 
+        "editor.defaultFormatter": "ms-python.python"
+    },
+    "python.languageServer": "None",
+    "basedpyright.analysis.typeCheckingMode": "basic"
+}
