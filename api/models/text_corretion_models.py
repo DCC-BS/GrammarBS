@@ -20,6 +20,8 @@ class TextCorrectionOptions:
 class CorrectionBlock(BaseModel):
     original: Annotated[str, "The original text"]
     corrected: Annotated[List[str], "The corrected text"]
+    offset: int
+    length: int
     explanation: Annotated[str, Field(description="A short explanation of the correction use the language of the original text")]
 
 class CorrectionBlocks(BaseModel):

@@ -25,7 +25,7 @@ class TextCorrectionService:
         # call language tool api
         response = requests.post(
             f"{config.language_tool_api_url}/check",
-            data={"text": text, "language": "de"},
+            data={"text": text, "language": "auto", "preferredVariants": "de-CH"},
         )
 
         # parse response
@@ -33,12 +33,16 @@ class TextCorrectionService:
 
         language_tool_response = LanguageToolResponse(**response.json())
 
-        print(language_tool_response)
-
         # create correction blocks
         blocks = []
         for match in language_tool_response.matches:
-            blocks.append(CorrectionBlock(original=text, corrected=list(map(lambda replacement: replacement.value, match.replacements)), explanation=match.message))
+            blocks.append(CorrectionBlock(
+                original=match.context.text[match.context.offset:match.context.offset + match.context.length],
+                corrected=list(map(lambda replacement: replacement.value, match.replacements)),
+                explanation=match.message,
+                offset=match.offset,
+                length=match.length
+            ))
 
         return right(CorrectionResult(blocks=blocks, original=text))
 

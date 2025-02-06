@@ -4,7 +4,8 @@ import { Plugin } from '@tiptap/pm/state'
 import type { EditorView } from '@tiptap/pm/view'
 
 type CorrectionMarkOptions = {
-    onClick: (event: MouseEvent, node: ProseMirrorNode) => void
+    onClick: (event: MouseEvent, node: ProseMirrorNode) => void,
+    active: boolean,
 }
 
 export const CorrectionMark = Mark.create<CorrectionMarkOptions>({
@@ -13,6 +14,7 @@ export const CorrectionMark = Mark.create<CorrectionMarkOptions>({
     addOptions() {
         return {
             onClick: () => { },
+            active: false,
         }
     },
 
@@ -25,13 +27,24 @@ export const CorrectionMark = Mark.create<CorrectionMarkOptions>({
     },
 
     renderHTML({ HTMLAttributes }) {
-        return ['span', mergeAttributes({ class: 'correction' }, HTMLAttributes), 0]
+        const classNames = this.options.active ? 'correction active' : 'correction';
+
+        console.log('classNames', classNames);
+
+        return ['span', mergeAttributes({ class: classNames }, HTMLAttributes), 0]
     },
 
     addAttributes() {
         return {
             'data-block-id': {
                 default: null,
+                parseHTML: (element) => element.getAttribute('data-block-id'),
+                renderHTML: (attributes) => {
+                    if (!attributes['data-block-id']) {
+                        return {};
+                    }
+                    return { 'data-block-id': attributes['data-block-id'] };
+                },
             },
         }
     },
@@ -50,9 +63,12 @@ export const CorrectionMark = Mark.create<CorrectionMarkOptions>({
                         const node = doc.nodeAt(pos);
 
                         if (node && node.marks.find((mark: Mark) => mark.type.name === 'correction')) {
-                            this.options.onClick(event, node)
+                            this.options.onClick(event, node);
+                            this.options.active = true;
                             return true
                         }
+
+                        this.options.active = false;
 
                         return false
                     },

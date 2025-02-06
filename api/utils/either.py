@@ -1,4 +1,4 @@
-from typing import TypeVar, Generic, Callable, Union, Any
+from typing import Any, Callable, Generic, TypeVar, Union
 
 L = TypeVar('L')  # Left type
 R = TypeVar('R')  # Right type

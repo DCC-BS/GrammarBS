@@ -1,44 +1,88 @@
 <script setup lang="ts">
 import type { TextCorrectionBlock, TextCorrectionResponse } from '~/assets/models/text-correction';
+import type { Range } from '@tiptap/vue-3';
 import TextEditor from './text-editor.vue';
+
 
 const inputText = ref('This is the input text');
 const blocks = ref<TextCorrectionBlock[]>([]);
 const selectedBlock = ref<TextCorrectionBlock | null>(null);
+const error = ref<Error | null>(null);
+const status = ref<'pending' | 'success' | 'error' | 'idle'>('idle');
+const textEditor = ref<InstanceType<typeof TextEditor>>();
+const rewriteRange = ref<Range>();
 
-const { data, error, execute, status } = await useAsyncData(
-    'text-correction',
-    () => useApiFetch<TextCorrectionResponse>(
-        '/text-correction',
-        JSON.stringify({ text: inputText.value }),
-        'POST',
-        true),
-    {
-        immediate: false,
-    });
+let currentCorrectTextAbortController: AbortController | null = null;
 
-watch(data, () => {
-    if (data.value) {
-        console.log(data.value);
-        blocks.value = data.value.blocks.filter(block => block.original !== block.corrected);
-        console.log(blocks.value);
-    } else {
-        blocks.value = [];
-    }
+watch(inputText, () => {
+    correctText();
 });
 
+async function correctText() {
+    // Cancel any ongoing request
+    if (currentCorrectTextAbortController) {
+        currentCorrectTextAbortController.abort("aborded");
+    }
 
-function correctText() {
-    execute();
+    // Create new abort controller for this request
+    currentCorrectTextAbortController = new AbortController();
+
+    status.value = 'pending';
+    try {
+        const response = await $fetch<TextCorrectionResponse>('/api/correct', {
+            body: { text: inputText.value },
+            method: 'POST',
+            signal: currentCorrectTextAbortController.signal
+        });
+        blocks.value = response.blocks;
+    } catch (e: any) {
+        if ("cause" in e && e.cause == "aborded") {
+            return;
+        }
+
+        error.value = e as Error;
+    } finally {
+        status.value = 'idle';
+        currentCorrectTextAbortController = null;
+    }
 }
 
-function applyBlock(block: TextCorrectionBlock) {
-    inputText.value = inputText.value.replace(block.original, block.corrected);
-    correctText();
+function applyBlock(block: TextCorrectionBlock, corrected: string) {
+    textEditor.value?.applyCorrection(block, corrected);
+}
+
+function onCorrectionApplied(block: TextCorrectionBlock, corrected: string) {
+    blocks.value = blocks.value.filter(b => b.offset !== block.offset);
 }
 
 function handleBlockClick(block: TextCorrectionBlock) {
     selectedBlock.value = block;
+
+    const blockElement = document.getElementById(`block-${block.offset}`);
+    if (blockElement) {
+        console.log("scroll to block");
+        scrollToBlock(blockElement);
+    }
+
+}
+
+function scrollToBlock(blockElement: HTMLElement) {
+    // Get the scrollable container
+    const container = blockElement.closest('.scrollable-container');
+    if (!container) return;
+
+    // Calculate the scroll position
+    const containerRect = container.getBoundingClientRect();
+    const elementRect = blockElement.getBoundingClientRect();
+    const relativeTop = elementRect.top - containerRect.top;
+
+    // Scroll the container
+    container.scrollTop = container.scrollTop + relativeTop - (containerRect.height / 2) + (elementRect.height / 2);
+}
+
+
+function onRewriteText(text: string, range: Range) {
+    rewriteRange.value = range;
 }
 
 </script>
@@ -50,37 +94,40 @@ function handleBlockClick(block: TextCorrectionBlock) {
         <div class="flex gap-4 w-full">
             <div class="w-3/4 h-[90vh]">
                 <client-only>
-                    <TextEditor v-model="inputText" :blocks="blocks" @block-click="handleBlockClick" />
+                    <TextEditor ref="textEditor" v-model="inputText" :blocks="blocks" @block-click="handleBlockClick"
+                        @rewrite-text="onRewriteText" @correction-applied="onCorrectionApplied" />
                 </client-only>
             </div>
-            <div>
-                <template v-for="block in blocks">
-                    <UCard
-                        :ui="{ ring: selectedBlock?.original == block.original ? 'ring-2 ring-blue-500' : 'ring-2 ring-transparent' }">
-                        <div>
-                            {{ selectedBlock?.original == block.original ? 'selected' : 'not selected' }}
-                        </div>
 
-                        <div>
-                            Original: {{ block.original }}
-                        </div>
+            <div class="w-1/4 flex flex-col gap-2">
+                <RewriteView v-if="textEditor" :text-editor="textEditor" :range="rewriteRange" :text="inputText" />
 
-                        <div>
-                            Corrected: {{ block.corrected }}
-                        </div>
-                        <div>
-                            Explanation: {{ block.explanation }}
-                        </div>
+                <div class="overflow-y-scroll h-[90vh] scrollable-container">
+                    <template v-for="block in blocks">
+                        <UCard :id="`block-${block.offset}`">
+                            <div @click="handleBlockClick(block)">
 
-                        <template #footer>
-                            <UButton @click="applyBlock(block)">Correct</UButton>
-                        </template>
-                    </UCard>
-                </template>
+                                {{ block.original }}
+                            </div>
+
+                            <div v-if="selectedBlock == block">
+                                <div>
+                                    {{ block.explanation }}
+                                </div>
+
+                                <div class="flex gap-2 flex-wrap">
+                                    <UButton v-for="corrected in block.corrected.slice(0, 5)"
+                                        @click="applyBlock(block, corrected)">
+                                        {{ corrected }}
+                                    </UButton>
+                                </div>
+                            </div>
+                        </UCard>
+                    </template>
+                </div>
             </div>
         </div>
 
         <UIcon v-if="status === 'pending'" name="i-heroicons-arrow-path" class="animate-spin" />
-        <UButton @click="correctText">Correct</UButton>
     </div>
 </template>

@@ -20,6 +20,12 @@ class LanguageToolLanguage(BaseModel):
 class LanguageToolReplacement(BaseModel):
     value: str
 
+
+class LanguageToolContext(BaseModel):
+    text: str
+    offset: int
+    length: int
+
 class LanguageToolMatch(BaseModel):
     message: str
     shortMessage: str
@@ -27,6 +33,7 @@ class LanguageToolMatch(BaseModel):
     length: int
     replacements: list[LanguageToolReplacement]
 
+    context: LanguageToolContext
 
 
 class LanguageToolResponse(BaseModel):
