@@ -25,7 +25,7 @@ class TextCorrectionService:
         # call language tool api
         response = requests.post(
             f"{config.language_tool_api_url}/check",
-            data={"text": text, "language": "auto", "preferredVariants": "de-CH"},
+            data={"text": text, "language": "auto", "preferredVariants": "de-CH", "level": "picky"},
         )
 
         # parse response
@@ -45,6 +45,3 @@ class TextCorrectionService:
             ))
 
         return right(CorrectionResult(blocks=blocks, original=text))
-
-
-

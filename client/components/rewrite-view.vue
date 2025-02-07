@@ -1,17 +1,23 @@
 <script lang="ts" setup>
-import type { TextEditor } from '#components';
 import type { Range } from '@tiptap/vue-3';
 import type { Status } from '~/assets/models/status';
 import type { RewriteApplyOptions, TextRewriteResponse } from '~/assets/models/text-rewrite';
 
+// definitions
 interface RewriteViewProps {
     range?: Range;
     text?: string;
-    textEditor: InstanceType<typeof TextEditor>;
 }
 
+// input
 const props = defineProps<RewriteViewProps>();
 
+// output
+const emit = defineEmits<{
+    rewriteApplied: [option: string]
+}>();
+
+// refs
 const rewriteOptions = ref<RewriteApplyOptions>();
 const error = ref<Error | null>(null);
 const status = ref<Status>('idle');
@@ -19,8 +25,11 @@ const status = ref<Status>('idle');
 const formality = ref<string>('neutral');
 const domain = ref<string>('General');
 
+// composables
 const { t } = useI18n();
+const { addProgress, removeProgress } = useUseProgressIndication();
 
+// listeners
 watch(() => props.range, () => {
     if (!props.range || !props.text) {
         return;
@@ -48,12 +57,16 @@ watch(domain, () => {
     rewriteText(props.text, props.range.from, props.range.to);
 });
 
+// functions
 async function rewriteText(text: string, from: number, to: number) {
     const textToRewrite = text.slice(from - 1, to);
     const context = `${text.slice(0, from - 1)}<rewrite>${textToRewrite}</rewrite>${text.slice(to)}`;
 
     rewriteOptions.value = undefined;
-    status.value = 'pending';
+    addProgress('rewriting', {
+        icon: 'i-heroicons-pencil',
+        title: 'Rewriting text'
+    });
     error.value = null;
     try {
         const body = {
@@ -68,7 +81,7 @@ async function rewriteText(text: string, from: number, to: number) {
     } catch (e) {
         error.value = e as Error;
     } finally {
-        status.value = 'idle';
+        removeProgress('rewriting');
     }
 }
 
@@ -77,10 +90,7 @@ function applyRewrite(option: string) {
         return;
     }
 
-    const from = rewriteOptions.value.from;
-    const to = rewriteOptions.value.to;
-
-    props.textEditor.applyText(option, { from: from, to: to });
+    emit('rewriteApplied', option);
     rewriteOptions.value = undefined;
 }
 </script>

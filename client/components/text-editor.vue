@@ -4,11 +4,15 @@ import StarterKit from '@tiptap/starter-kit'
 import type { TextCorrectionBlock } from '~/assets/models/text-correction'
 import type { Node } from '@tiptap/pm/model';
 import { CorrectionMark } from '~/utils/correction-mark';
+import CharacterCount from '@tiptap/extension-character-count'
 
+
+// input
 const props = defineProps<{
     blocks: TextCorrectionBlock[]
 }>()
 
+// output
 const emit = defineEmits<{
     blockClick: [block: TextCorrectionBlock]
     blockSelected: [block: TextCorrectionBlock]
@@ -17,17 +21,36 @@ const emit = defineEmits<{
     correctionApplied: [block: TextCorrectionBlock, corrected: string]
 }>()
 
-const model = defineModel<string>('modelValue', { required: true })
+defineExpose({ applyCorrection, applyText });
+
+// model
+const model = defineModel<string>('modelValue', { required: true });
+
+// refs
+const limit = ref(10_000);
+
+// computed
+const currentPosition = computed(() => editor.value?.state.selection.from ?? -1);
+const currentBlock = computed(() => props.blocks.find(b => b.offset + 1 == currentPosition.value));
+const characterCountPercentage = computed(() => Math.round((100 / limit.value) * editor.value?.storage.characterCount.characters()));
+
+// composables
+const toast = useToast();
+
 
 const editor = useEditor({
-    content: '',
+    content: model.value,
     extensions: [
         StarterKit,
         // @ts-ignore
         BubbleMenu,
+        CharacterCount.configure({
+            limit: limit.value,
+        }),
         CorrectionMark.configure({
             onClick: (event: MouseEvent, node: Node) => {
                 const mark = node.marks.find(m => m.attrs['data-block-id']);
+
                 const id = mark?.attrs['data-block-id'];
                 const block = props.blocks.find(b => b.offset === id);
 
@@ -42,12 +65,36 @@ const editor = useEditor({
             },
         })
     ],
+    editorProps: {
+        handleKeyDown: (view, event) => {
+            // Check if Ctrl+C is pressed
+            if (event.ctrlKey && event.key === 'c') {
+                // Check if there is no text selection
+                if (editor.value?.state.selection.empty) {
+                    // Select all text
+                    editor.value?.commands.selectAll();
+                    toast.add({
+                        title: 'Ctrl+C pressed',
+                        description: 'Select all text',
+                        color: 'blue',
+                        icon: 'i-heroicons-clipboard-document-list',
+                    });
+                }
+            }
+        },
+
+    },
     onUpdate: ({ editor }) => {
         model.value = editor.getText()
     },
+});
 
-})
+// lifecycle
+onUnmounted(() => {
+    editor.value?.destroy()
+});
 
+// listeners
 watch(model, (value) => {
     if (!editor.value) return;
 
@@ -81,6 +128,7 @@ watch(() => props.blocks, (value) => {
     }
 });
 
+// functions
 function rewriteText() {
     if (!editor.value) {
         return;
@@ -95,50 +143,56 @@ function applyCorrection(block: TextCorrectionBlock, corrected: string) {
     const start = block.offset + 1;
     const end = start + block.length;
 
-    editor.value.chain()
-        .deleteRange({ from: start, to: end })
-        .insertContentAt(start, corrected)
-        .run();
+    applyText(corrected, { from: start, to: end });
 
     emit('correctionApplied', block, corrected);
 }
 
-function applyText(text: string, range: Range) {
+async function applyText(text: string, range: Range) {
     if (!editor.value) return;
 
     editor.value.chain()
         .deleteRange(range)
         .insertContentAt(range.from, text)
+        .focus(range.from)
         .run();
 }
-
-onUnmounted(() => {
-    editor.value?.destroy()
-})
-
-defineExpose({ applyCorrection, applyText });
-
-const currentPosition = computed(() => editor.value?.state.selection.from ?? -1);
-const currentBlock = computed(() => props.blocks.find(b => b.offset + 1 == currentPosition.value));
 </script>
 
 <template>
-    <bubble-menu :editor="editor" :tippy-options="{ duration: 100 }" v-if="editor">
-        <div class="bubble-menu">
-            <div class="flex gap-1" v-if="editor.isActive('correction') && currentBlock">
-                <UButton v-for="correction in currentBlock.corrected.slice(0, 5)" :key="correction"
-                    @click="applyCorrection(currentBlock, correction)">
-                    {{ correction }}
-                </UButton>
+    <div v-if="editor" class="w-full h-full">
+        <bubble-menu :editor="editor" :tippy-options="{ duration: 100 }">
+            <div class="bubble-menu">
+                <div class="flex gap-1"
+                    v-if="editor.isActive('correction') && currentBlock && currentBlock.corrected.length > 0">
+                    <UButton v-for="correction in currentBlock.corrected.slice(0, 5)" :key="correction"
+                        @click="applyCorrection(currentBlock, correction)">
+                        {{ correction }}
+                    </UButton>
 
+                </div>
+                <UButton @click="rewriteText" variant="ghost" v-else>
+                    Rewrite
+                </UButton>
             </div>
-            <UButton @click="rewriteText" variant="ghost" v-else>
-                Rewrite
-            </UButton>
+        </bubble-menu>
+        <div class="ring-1 ring-gray-400 w-full h-full overflow-y-scroll">
+            <editor-content :editor="editor" spellcheck="false" class="w-full h-full"></editor-content>
         </div>
-    </bubble-menu>
-    <div class="ring-1 ring-gray-400 w-full h-full overflow-y-scroll">
-        <editor-content :editor="editor" spellcheck="false" class="w-full h-full"></editor-content>
+        <div class="flex items-center gap-2 justify-end"
+            :class="{ 'character-count--warning': editor.storage.characterCount.characters() === limit }">
+            <svg height="20" width="20" viewBox="0 0 20 20">
+                <circle r="10" cx="10" cy="10" fill="#e9ecef" />
+                <circle r="5" cx="10" cy="10" fill="transparent" stroke="currentColor" stroke-width="10"
+                    :stroke-dasharray="`calc(${characterCountPercentage} * 31.4 / 100) 31.4`"
+                    transform="rotate(-90) translate(-20)" />
+                <circle r="6" cx="10" cy="10" fill="white" />
+            </svg>
+
+            {{ editor.storage.characterCount.characters() }} / {{ limit }} characters
+            <br>
+            {{ editor.storage.characterCount.words() }} words
+        </div>
     </div>
 </template>
 
@@ -154,5 +208,9 @@ const currentBlock = computed(() => props.blocks.find(b => b.offset + 1 == curre
 
 .correction .active {
     @apply bg-blue-100;
+}
+
+.character-count--warning {
+    @apply text-red-500;
 }
 </style>

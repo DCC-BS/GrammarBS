@@ -1,10 +1,12 @@
 <script lang="ts" setup>
 
+// definitions
 interface SelectMenuLocalizedProps {
     options: string[];
     localParent?: string;
 }
 
+// input
 const props = withDefaults(defineProps<SelectMenuLocalizedProps>(), {
     localParent: '',
 });

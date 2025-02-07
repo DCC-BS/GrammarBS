@@ -5,7 +5,7 @@ export default defineNuxtConfig({
     colorMode: {
         preference: 'light',
     },
-    modules: ['@nuxt/ui', '@nuxtjs/i18n'],
+    modules: ['@nuxt/ui', '@nuxtjs/i18n', '@vite-pwa/nuxt'],
     css: ['~/assets/css/main.scss'],
     postcss: {
         plugins: {
@@ -21,5 +21,35 @@ export default defineNuxtConfig({
     },
     i18n: {
         vueI18n: './i18n.config.ts'
+    },
+    pwa: {
+        registerType: 'autoUpdate',
+        client: {
+            periodicSyncForUpdates: 60 * 10, // 10 minutes
+        },
+        devOptions: {
+            enabled: true,
+        },
+        manifest: {
+            name: 'Grammar Editor',
+            short_name: 'Grammar Editor',
+            description: 'Grammar Editor',
+            theme_color: '#000000',
+            background_color: '#000000',
+            icons: [
+                {
+                    src: '/HeroiconsLanguage.png',
+                    sizes: '512x512',
+                },
+            ],
+
+            shortcuts: [
+                {
+                    name: 'From Clipboard',
+                    url: '/?clipboard=true',
+                    icons: [{ src: '/MaterialSymbolsContentPasteGo.png', sizes: '512x512' }],
+                },
+            ],
+        },
     }
 })

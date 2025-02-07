@@ -1,5 +1,5 @@
 import { Mark, mergeAttributes } from '@tiptap/core'
-import type { Node as ProseMirrorNode } from '@tiptap/pm/model'
+import type { Node as ProseMirrorNode, Mark as ProseMirrorMark } from '@tiptap/pm/model'
 import { Plugin } from '@tiptap/pm/state'
 import type { EditorView } from '@tiptap/pm/view'
 
@@ -28,9 +28,6 @@ export const CorrectionMark = Mark.create<CorrectionMarkOptions>({
 
     renderHTML({ HTMLAttributes }) {
         const classNames = this.options.active ? 'correction active' : 'correction';
-
-        console.log('classNames', classNames);
-
         return ['span', mergeAttributes({ class: classNames }, HTMLAttributes), 0]
     },
 
@@ -62,7 +59,7 @@ export const CorrectionMark = Mark.create<CorrectionMarkOptions>({
 
                         const node = doc.nodeAt(pos);
 
-                        if (node && node.marks.find((mark: Mark) => mark.type.name === 'correction')) {
+                        if (node?.marks.find((mark: ProseMirrorMark) => mark.type.name === 'correction')) {
                             this.options.onClick(event, node);
                             this.options.active = true;
                             return true
@@ -76,4 +73,4 @@ export const CorrectionMark = Mark.create<CorrectionMarkOptions>({
             }),
         ]
     },
-})
+});
