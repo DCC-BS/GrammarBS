@@ -1,8 +1,22 @@
+import { Title } from "#components";
+
 export default defineI18nConfig(() => ({
     legacy: false,
     locale: 'de',
     messages: {
         en: {
+            status: {
+                rewritingText: 'Rewriting text...',
+                correctingText: 'Correcting text...',
+                ready: 'Ready',
+            },
+            problems: {
+                title: 'Problems',
+                noProblems: 'No problems found',
+            },
+            editor: {
+                rewrite: 'Rewrite',
+            },
             rewrite: {
                 formality: {
                     neutral: 'Neutral',
@@ -22,8 +36,19 @@ export default defineI18nConfig(() => ({
             },
         },
 
-
         de: {
+            status: {
+                rewritingText: 'Text wird umgeschrieben...',
+                correctingText: 'Text wird korrigiert...',
+                ready: 'Bereit',
+            },
+            problems: {
+                title: 'Probleme',
+                noProblems: 'Keine Probleme gefunden',
+            },
+            editor: {
+                rewrite: 'Umschreiben',
+            },
             rewrite: {
                 formality: {
                     neutral: 'Neutral',

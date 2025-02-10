@@ -1,10 +1,14 @@
 #!/bin/bash
+set -e
 
 download_ngrams() {
     lang=$1
     base_url="https://languagetool.org/download/ngram-data"
 
     if [ ! -d "/ngrams/$lang" ] || [ -z "$(ls -A /ngrams/$lang)" ]; then
+        # create the directory if it doesn't exist
+        mkdir -p "/ngrams"
+
         echo "Searching for the latest n-grams for $lang..."
 
         # Get the list of available files and sort by date (newest first)
@@ -19,10 +23,11 @@ download_ngrams() {
         fi
 
         echo "Downloading $latest_file..."
-        wget -q "$base_url/$latest_file" -O "/tmp/$latest_file"
+        wget -e dotbytes=100M "$base_url/$latest_file" -O "/tmp/$latest_file"
 
         echo "Extracting n-grams..."
-        unzip -q "/tmp/$latest_file" -d "/ngrams/"
+        7z x "/tmp/$latest_file" -o"/ngrams/"
+        # unzip "/tmp/$latest_file" -d "/ngrams/"
         rm "/tmp/$latest_file"
 
         echo "N-grams for $lang downloaded and extracted."

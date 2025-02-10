@@ -17,17 +17,17 @@ const emit = defineEmits<{
     rewriteApplied: [option: string]
 }>();
 
+// composables
+const { t } = useI18n();
+const { addProgress, removeProgress } = useUseProgressIndication();
+
 // refs
 const rewriteOptions = ref<RewriteApplyOptions>();
 const error = ref<Error | null>(null);
 const status = ref<Status>('idle');
 
-const formality = ref<string>('neutral');
-const domain = ref<string>('General');
-
-// composables
-const { t } = useI18n();
-const { addProgress, removeProgress } = useUseProgressIndication();
+const formality = ref<string>(t('rewrite.formality.neutral'));
+const domain = ref<string>(t('rewrite.domain.general'));
 
 // listeners
 watch(() => props.range, () => {
@@ -39,7 +39,7 @@ watch(() => props.range, () => {
     const to = props.range.to;
 
     return rewriteText(props.text, from, to);
-});
+}, { immediate: true });
 
 watch(formality, () => {
     if (!props.range || !props.text) {
@@ -59,13 +59,16 @@ watch(domain, () => {
 
 // functions
 async function rewriteText(text: string, from: number, to: number) {
-    const textToRewrite = text.slice(from - 1, to);
-    const context = `${text.slice(0, from - 1)}<rewrite>${textToRewrite}</rewrite>${text.slice(to)}`;
+
+    from = Math.max(0, from - 1);
+
+    const textToRewrite = text.slice(from, to);
+    const context = `${text.slice(0, from)}<rewrite>${textToRewrite}</rewrite>${text.slice(to)}`;
 
     rewriteOptions.value = undefined;
     addProgress('rewriting', {
         icon: 'i-heroicons-pencil',
-        title: 'Rewriting text'
+        title: t('status.rewritingText')
     });
     error.value = null;
     try {
@@ -111,7 +114,7 @@ function applyRewrite(option: string) {
         </div>
 
         <div v-for="option in rewriteOptions.options">
-            {{ option }}
+            <div v-html="option.replace(/\n/g, '<br>')"></div>
             <UButton @click="applyRewrite(option)">{{ t('rewrite.apply') }} </UButton>
         </div>
     </UCard>

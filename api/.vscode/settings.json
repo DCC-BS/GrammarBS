@@ -10,8 +10,6 @@
     "editor.detectIndentation": false,
     "[python]": {
         "editor.formatOnSave": true,
-        "editor.defaultFormatter": "ms-python.python"
+        "editor.defaultFormatter": "charliermarsh.ruff"
     },
-    "python.languageServer": "None",
-    "basedpyright.analysis.typeCheckingMode": "basic"
 }

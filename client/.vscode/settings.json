@@ -1,9 +1,17 @@
 {
     "editor.renderWhitespace": "all",
-    "editor.rulers": [100],
+    "editor.rulers": [
+        100
+    ],
     "files.trimTrailingWhitespace": true,
     "files.insertFinalNewline": true,
     "editor.tabSize": 4,
     "editor.insertSpaces": true,
-    "editor.detectIndentation": false
-} 
+    "editor.detectIndentation": false,
+    "files.exclude": {
+        ".nuxt": true,
+        "dist": true,
+        "node_modules": true,
+        ".output": true,
+    }
+}

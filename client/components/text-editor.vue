@@ -36,7 +36,7 @@ const characterCountPercentage = computed(() => Math.round((100 / limit.value) *
 
 // composables
 const toast = useToast();
-
+const { t } = useI18n();
 
 const editor = useEditor({
     content: model.value,
@@ -169,10 +169,9 @@ async function applyText(text: string, range: Range) {
                         @click="applyCorrection(currentBlock, correction)">
                         {{ correction }}
                     </UButton>
-
                 </div>
                 <UButton @click="rewriteText" variant="ghost" v-else>
-                    Rewrite
+                    {{ t('editor.rewrite') }}
                 </UButton>
             </div>
         </bubble-menu>

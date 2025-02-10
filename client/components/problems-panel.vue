@@ -18,6 +18,9 @@ const emit = defineEmits<{
 
 defineExpose({ jumpToBlock });
 
+// composables
+const { t } = useI18n();
+
 // refs
 const selectedBlock = ref<TextCorrectionBlock | null>(null);
 
@@ -58,26 +61,28 @@ function applyBlock(block: TextCorrectionBlock, corrected: string) {
 </script>
 
 <template>
-    <div class="overflow-y-scroll h-[90vh] scrollable-container">
-        <template v-for="block in blocks">
-            <UCard :id="`block-${block.offset}`">
-                <div @click="selectBlock(block)">
-
-                    {{ block.original }}
-                </div>
-
-                <div v-if="selectedBlock == block">
-                    <div>
-                        {{ block.explanation }}
+    <div v-if="blocks.length > 0">
+        <div class="text-lg">{{ t('problems.title') }}</div>
+        <div class="overflow-y-scroll h-[90vh] scrollable-container">
+            <template v-for="block in blocks">
+                <UCard :id="`block-${block.offset}`" class="m-2">
+                    <div @click="selectBlock(block)">
+                        {{ block.original.replace(/\s/g, '_') }} - {{ block.explanation }}
                     </div>
 
-                    <div class="flex gap-2 flex-wrap">
-                        <UButton v-for="corrected in block.corrected.slice(0, 5)" @click="applyBlock(block, corrected)">
-                            {{ corrected }}
-                        </UButton>
+                    <div v-if="selectedBlock == block">
+                        <div class="flex gap-2 flex-wrap mt-1">
+                            <UButton v-for="corrected in block.corrected.slice(0, 5)"
+                                @click="applyBlock(block, corrected)">
+                                {{ corrected }}
+                            </UButton>
+                        </div>
                     </div>
-                </div>
-            </UCard>
-        </template>
+                </UCard>
+            </template>
+        </div>
+    </div>
+    <div v-else>
+        <div class="text-lg">{{ t('problems.noProblems') }}</div>
     </div>
 </template>

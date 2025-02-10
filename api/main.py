@@ -6,6 +6,7 @@ from models.text_corretion_models import CorrectionResult, TextCorrectionOptions
 from models.text_rewrite_models import RewriteResult, TextRewriteOptions
 from services.rewrite_text import TextRewriteService
 from services.text_correction_language_tool import TextCorrectionService
+from services.advisor import AdvisorOutput, AdvisorService
 
 app = FastAPI()
 
@@ -21,9 +22,12 @@ app.add_middleware(
 
 text_correction_service = TextCorrectionService()
 text_rewrite_service = TextRewriteService()
+advisor_service = AdvisorService()
+
 
 class ChatPrompt(BaseModel):
     text: str
+
 
 @app.post("/text-correction")
 def chat_completions(text: ChatPrompt) -> CorrectionResult:
@@ -34,6 +38,7 @@ def chat_completions(text: ChatPrompt) -> CorrectionResult:
 
     return result.right()
 
+
 class RewritePrompt(BaseModel):
     text: str
     context: str
@@ -43,11 +48,7 @@ class RewritePrompt(BaseModel):
 
 @app.post("/text-rewrite")
 def rewrite_text(data: RewritePrompt) -> RewriteResult:
-
-    options = TextRewriteOptions(
-        domain=data.domain,
-        formality=data.formality
-    )
+    options = TextRewriteOptions(domain=data.domain, formality=data.formality)
 
     result = text_rewrite_service.rewrite_text(data.text, data.context, options)
 
@@ -56,3 +57,20 @@ def rewrite_text(data: RewritePrompt) -> RewriteResult:
 
     return result.right()
 
+
+class AdvisorPrompt(BaseModel):
+    text: str
+    domain: str = "general"
+    formality: str = "neutral"
+
+
+@app.post("/advisor")
+def advisor(data: AdvisorPrompt) -> AdvisorOutput:
+    options = TextRewriteOptions(domain=data.domain, formality=data.formality)
+
+    result = advisor_service.advise_changes(data.text, options)
+
+    if result.is_left():
+        raise HTTPException(status_code=400, detail=result.left())
+
+    return result.right()

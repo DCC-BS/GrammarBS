@@ -6,10 +6,8 @@ services:
       - ${LANGUAGE_TOOL_PORT}:8010 # Using default port from the image
     environment:
       - langtool_languageModel=/ngrams # OPTIONAL: Using ngrams data
-      - Java_Xms=512m # OPTIONAL: Setting a minimal Java heap size of 512 mib
-      - Java_Xmx=1g # OPTIONAL: Setting a maximum Java heap size of 1 Gib
-    #volumes:
-    #  - ${LANGUAGE_TOOL_CACHE_DIR}/ngrams:/ngrams # OPTIONAL: The location of ngrams data on the local machine
+      - Java_Xms=512m
+      - Java_Xmx=2g
 
   vllm_qwen25_32b:
     image: vllm/vllm-openai:v0.7.0
