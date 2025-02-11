@@ -25,6 +25,10 @@ export default defineNuxtConfig({
         vueI18n: './i18n.config.ts',
         lazy: true,
     },
+    nitro: {
+        serveStatic: true,
+        node: true,
+    },
     pwa: {
         registerType: 'autoUpdate',
         client: {
