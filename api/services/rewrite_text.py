@@ -10,14 +10,21 @@ from utils.either import Either, right
 
 class RewirteInfo(dspy.Signature):
     """
-    Rewrite the text, return a list of options.
+    Give alternatives to the text in respect of the domain and the formality.
     """
 
     text: str = dspy.InputField(desc="The text to be rewritten")
     context: str = dspy.InputField(desc="The full text of the document, text to be rewritten is marked with <rewrite>")
     formality: str = dspy.InputField(desc="The formality to use for the rewritten text")
-    domain: str = dspy.InputField(desc="The domain the use for the rewritten text")
-    options: List[str] = dspy.OutputField(desc="The rewritten texts")
+    domain: str = dspy.InputField(
+        desc="""The domain to use for the rewritten text.
+                - general: General text
+                - report: Text for a report or document
+                - email: Text for an email
+                - socialMedia: Text for social media post (e.g., Twitter, Facebook, etc.)
+                - technical: Technical text""",
+    )
+    options: List[str] = dspy.OutputField(desc="A list of alternative texts")
 
 
 @final
@@ -28,7 +35,7 @@ class TextRewriteService:
             api_base=config.openai_api_base_url,
             api_key=config.openai_api_key,
             max_tokens=1000,
-            temperature=0.5,
+            temperature=0.6,
         )
         dspy.configure(lm=lm)
 

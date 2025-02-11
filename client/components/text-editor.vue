@@ -5,7 +5,7 @@ import type { TextCorrectionBlock } from '~/assets/models/text-correction'
 import type { Node } from '@tiptap/pm/model';
 import { CorrectionMark } from '~/utils/correction-mark';
 import CharacterCount from '@tiptap/extension-character-count'
-
+import { ApplyCorrectionCommand, ApplyTextCommand } from '~/assets/models/commands';
 
 // input
 const props = defineProps<{
@@ -21,8 +21,6 @@ const emit = defineEmits<{
     correctionApplied: [block: TextCorrectionBlock, corrected: string]
 }>()
 
-defineExpose({ applyCorrection, applyText });
-
 // model
 const model = defineModel<string>('modelValue', { required: true });
 
@@ -37,6 +35,7 @@ const characterCountPercentage = computed(() => Math.round((100 / limit.value) *
 // composables
 const toast = useToast();
 const { t } = useI18n();
+const { registerHandler, unregisterHandler } = useCommandBus();
 
 const editor = useEditor({
     content: model.value,
@@ -90,8 +89,16 @@ const editor = useEditor({
 });
 
 // lifecycle
+onMounted(() => {
+    registerHandler('ApplyCorrectionCommand', applyCorrection);
+    registerHandler('ApplyTextCommand', applyText);
+});
+
 onUnmounted(() => {
-    editor.value?.destroy()
+    editor.value?.destroy();
+
+    unregisterHandler('ApplyCorrectionCommand', applyCorrection);
+    unregisterHandler('ApplyTextCommand', applyText);
 });
 
 // listeners
@@ -137,19 +144,24 @@ function rewriteText() {
     emit('rewriteText', editor.value.getText(), editor.value.state.selection);
 }
 
-function applyCorrection(block: TextCorrectionBlock, corrected: string) {
+async function applyCorrection(command: ApplyCorrectionCommand) {
     if (!editor.value) return;
+
+    const block = command.block;
+    const corrected = command.corrected;
 
     const start = block.offset + 1;
     const end = start + block.length;
 
-    applyText(corrected, { from: start, to: end });
+    applyText(new ApplyTextCommand(corrected, { from: start, to: end }));
 
     emit('correctionApplied', block, corrected);
 }
 
-async function applyText(text: string, range: Range) {
+async function applyText(command: ApplyTextCommand) {
     if (!editor.value) return;
+    const text = command.text;
+    const range = command.range;
 
     editor.value.chain()
         .deleteRange(range)
@@ -166,7 +178,7 @@ async function applyText(text: string, range: Range) {
                 <div class="flex gap-1"
                     v-if="editor.isActive('correction') && currentBlock && currentBlock.corrected.length > 0">
                     <UButton v-for="correction in currentBlock.corrected.slice(0, 5)" :key="correction"
-                        @click="applyCorrection(currentBlock, correction)">
+                        @click="applyCorrection(new ApplyCorrectionCommand(currentBlock, correction))">
                         {{ correction }}
                     </UButton>
                 </div>

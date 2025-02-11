@@ -17,23 +17,12 @@ class ProposeChanges(dspy.Signature):
     description: str = dspy.OutputField(desc="A description of the changes made to the text")
 
 
-# Readability
-# Calculate and display a readability score (e.g., Flesch-Kincaid Grade Level)40.
-# Offer suggestions to improve readability if necessary.
-# Formality
-# Assess how well the text matches the desired formality level21.
-# Suggest changes to align the text with the specified formality.
-# Domain Relevance
-# Evaluate how well the text fits the specified domain53.
-# Highlight any terms or concepts that may need adjustment to better suit the domain.
-# Coherence and Structure
-# Analyze the logical flow and consistency of ideas in the text47.
-# Suggest improvements for paragraph structure and transitions.
-
-
 class AdvisorInfo(dspy.Signature):
     """
-    Give advice on how to improve the text. Return a summary of the quality of the text and a list of proposed changes.
+    You are an assistant that helps improve the formality, domain, and coherence of text.
+    Give advice on how to improve the text.
+    Focus on the formality, domain, and coherence of the text and not on grammar or spelling mistakes.
+    If the text is in german use ss instead of ß.
     """
 
     text: str = dspy.InputField(desc="The text to inspect")
@@ -52,7 +41,7 @@ class AdvisorInfo(dspy.Signature):
     )
 
     proposedChanges: str = dspy.OutputField(
-        desc="Proposed changes to the text, answer in the language of the original text and format it with markdown."
+        desc="Report in the language of the original text about the proposed changes to the text formatted pretty in markdwon."
     )
 
 

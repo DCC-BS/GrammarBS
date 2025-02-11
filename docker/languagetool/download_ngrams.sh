@@ -27,7 +27,6 @@ download_ngrams() {
 
         echo "Extracting n-grams..."
         7z x "/tmp/$latest_file" -o"/ngrams/"
-        # unzip "/tmp/$latest_file" -d "/ngrams/"
         rm "/tmp/$latest_file"
 
         echo "N-grams for $lang downloaded and extracted."

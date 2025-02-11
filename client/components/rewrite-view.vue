@@ -1,66 +1,56 @@
 <script lang="ts" setup>
 import type { Range } from '@tiptap/vue-3';
-import type { Status } from '~/assets/models/status';
+import { ApplyTextCommand, RewriteTextCommand } from '~/assets/models/commands';
 import type { RewriteApplyOptions, TextRewriteResponse } from '~/assets/models/text-rewrite';
 
-// definitions
 interface RewriteViewProps {
-    range?: Range;
-    text?: string;
+    formality: string;
+    domain: string;
 }
 
-// input
 const props = defineProps<RewriteViewProps>();
-
-// output
-const emit = defineEmits<{
-    rewriteApplied: [option: string]
-}>();
 
 // composables
 const { t } = useI18n();
 const { addProgress, removeProgress } = useUseProgressIndication();
+const { registerHandler, unregisterHandler, executeCommand } = useCommandBus();
 
 // refs
 const rewriteOptions = ref<RewriteApplyOptions>();
 const error = ref<Error | null>(null);
-const status = ref<Status>('idle');
 
-const formality = ref<string>(t('rewrite.formality.neutral'));
-const domain = ref<string>(t('rewrite.domain.general'));
+const lastRange = ref<Range>();
+const lastText = ref<string>();
 
-// listeners
-watch(() => props.range, () => {
-    if (!props.range || !props.text) {
-        return;
-    }
-
-    const from = props.range.from;
-    const to = props.range.to;
-
-    return rewriteText(props.text, from, to);
-}, { immediate: true });
-
-watch(formality, () => {
-    if (!props.range || !props.text) {
-        return;
-    }
-
-    rewriteText(props.text, props.range.from, props.range.to);
+// life cycle
+onMounted(() => {
+    registerHandler('RewriteTextCommand', handleCommand);
 });
 
-watch(domain, () => {
-    if (!props.range || !props.text) {
+onUnmounted(() => {
+    unregisterHandler('RewriteTextCommand', handleCommand);
+});
+
+// listeners
+watch([() => props.formality, () => props.domain], () => {
+    if (!lastRange.value || !lastText.value) {
         return;
     }
 
-    rewriteText(props.text, props.range.from, props.range.to);
+    rewriteText(lastText.value, lastRange.value);
 });
 
 // functions
-async function rewriteText(text: string, from: number, to: number) {
+async function handleCommand(command: RewriteTextCommand) {
+    lastRange.value = command.range;
+    lastText.value = command.text;
 
-    from = Math.max(0, from - 1);
+    rewriteText(command.text, command.range);
+}
+
+async function rewriteText(text: string, range: Range) {
+    const from = Math.max(0, range.from - 1);
+    const to = Math.min(text.length, range.to + 1);
 
     const textToRewrite = text.slice(from, to);
     const context = `${text.slice(0, from)}<rewrite>${textToRewrite}</rewrite>${text.slice(to)}`;
@@ -75,8 +65,8 @@ async function rewriteText(text: string, from: number, to: number) {
         const body = {
             text: textToRewrite,
             context,
-            formality: formality.value,
-            domain: domain.value,
+            formality: props.formality,
+            domain: props.domain,
         };
 
         const response = await $fetch<TextRewriteResponse>('/api/rewrite', { body, method: 'POST' });
@@ -89,33 +79,34 @@ async function rewriteText(text: string, from: number, to: number) {
 }
 
 function applyRewrite(option: string) {
-    if (!rewriteOptions.value) {
+    if (!rewriteOptions.value || !lastRange.value) {
         return;
     }
 
-    emit('rewriteApplied', option);
+    executeCommand(new ApplyTextCommand(option, lastRange.value));
+
+    lastRange.value = undefined;
+    lastText.value = undefined;
     rewriteOptions.value = undefined;
 }
 </script>
 
 <template>
-    <UAlert v-if="error" color="red" variant="solid" title="Error" :description="error.message" />
-    <UIcon v-if="status === 'pending'" name="i-heroicons-arrow-path" class="animate-spin" />
+    <div v-if="!lastRange">
+        {{ t('rewrite.noRewrite') }}
+    </div>
+    <div v-else>
 
-    <UCard v-if="rewriteOptions && rewriteOptions.options.length > 0">
-        <div class="grid grid-cols-2">
-            <span>{{ t('rewrite.formalityLabel') }}</span>
-            <SelectMenuLocalized v-model="formality" :options="['neutral', 'formal', 'informal']"
-                local-parent="rewrite.formality" />
+        <UAlert v-if="error" color="red" variant="solid" title="Error" :description="error.message" />
 
-            <span>{{ t('rewrite.domainLabel') }}</span>
-            <SelectMenuLocalized v-model="domain" :options="['general', 'report', 'email', 'socialMedia', 'technical']"
-                local-parent="rewrite.domain" />
+        <div v-if="rewriteOptions && rewriteOptions.options.length > 0">
+            <div v-for="option in rewriteOptions.options">
+                <div v-html="option.replace(/\n/g, '<br>')"></div>
+                <UButton @click="applyRewrite(option)">{{ t('rewrite.apply') }} </UButton>
+            </div>
         </div>
-
-        <div v-for="option in rewriteOptions.options">
-            <div v-html="option.replace(/\n/g, '<br>')"></div>
-            <UButton @click="applyRewrite(option)">{{ t('rewrite.apply') }} </UButton>
+        <div v-else>
+            <USkeleton class="w-full h-[300px]" />
         </div>
-    </UCard>
+    </div>
 </template>

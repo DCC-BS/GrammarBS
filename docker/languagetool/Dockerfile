@@ -7,7 +7,8 @@ USER root
 RUN apk add --no-cache \
     bash \
     p7zip \
-    wget
+    wget \
+    pv
 
 # Create a directory for n-grams
 RUN mkdir -p /ngrams

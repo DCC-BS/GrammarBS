@@ -1,13 +1,18 @@
-import { Title } from "#components";
-
 export default defineI18nConfig(() => ({
     legacy: false,
+    availableLocales: ['en', 'de'],
     locale: 'de',
     messages: {
         en: {
+            tools: {
+                problems: 'Problems',
+                rewrite: 'Rewrite',
+                advisor: 'Advisor',
+            },
             status: {
                 rewritingText: 'Rewriting text...',
                 correctingText: 'Correcting text...',
+                advice: 'giving advice...',
                 ready: 'Ready',
             },
             problems: {
@@ -32,14 +37,27 @@ export default defineI18nConfig(() => ({
                 },
                 formalityLabel: 'Formality',
                 domainLabel: 'Domain',
-                apply: 'Apply'
+                apply: 'Apply',
+                noRewrite: 'Selecte text and click "Rewrite" to rewrite it'
             },
+            advisor: {
+                giveAdvice: 'Give Advice',
+                coherenceAndStructure: 'Coherence and Structure',
+                domainScore: 'Domain Score',
+                formalityScore: 'Formality Score',
+            }
         },
 
         de: {
+            tools: {
+                problems: 'Probleme',
+                rewrite: 'Umschreiben',
+                advisor: 'Berater',
+            },
             status: {
                 rewritingText: 'Text wird umgeschrieben...',
                 correctingText: 'Text wird korrigiert...',
+                advice: 'Ratschlag geben...',
                 ready: 'Bereit',
             },
             problems: {
@@ -64,9 +82,15 @@ export default defineI18nConfig(() => ({
                 },
                 formalityLabel: 'Formalität',
                 domainLabel: 'Domäne',
-                apply: 'Anwenden'
+                apply: 'Anwenden',
+                noRewrite: 'Text auswählen und auf "Umschreiben" klicken, um ihn umzuschreiben'
+            },
+            advisor: {
+                giveAdvice: 'Ratschlag geben',
+                coherenceAndStructure: 'Kohärenz und Struktur',
+                domainScore: 'Domänenscore',
+                formalityScore: 'Formalitätsscore',
             }
         }
     }
-
-}))
+}));

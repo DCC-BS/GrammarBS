@@ -21,5 +21,8 @@ const { t } = useI18n();
         <template #option="{ option }">
             {{ t(`${props.localParent}.${option}`) }}
         </template>
+        <template #label>
+            {{ t(`${props.localParent}.${modelValue}`) }}
+        </template>
     </USelectMenu>
 </template>

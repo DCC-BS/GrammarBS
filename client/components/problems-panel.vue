@@ -1,25 +1,18 @@
 <script lang="ts" setup>
+import { ApplyCorrectionCommand, type JumpToBlockCommand } from '~/assets/models/commands';
 import type { TextCorrectionBlock } from '~/assets/models/text-correction';
 
 // definitions
 interface CorrectionPanelProps {
     blocks: TextCorrectionBlock[];
-    selectedBlock?: TextCorrectionBlock;
 }
 
 // input
 const props = defineProps<CorrectionPanelProps>();
 
-// output
-const emit = defineEmits<{
-    blockSelected: [block: TextCorrectionBlock]
-    blockApplied: [block: TextCorrectionBlock, corrected: string]
-}>();
-
-defineExpose({ jumpToBlock });
-
 // composables
 const { t } = useI18n();
+const { registerHandler, unregisterHandler, executeCommand } = useCommandBus();
 
 // refs
 const selectedBlock = ref<TextCorrectionBlock | null>(null);
@@ -27,11 +20,20 @@ const selectedBlock = ref<TextCorrectionBlock | null>(null);
 // computed
 const blocks = computed(() => props.blocks);
 
-// functions
-function jumpToBlock(block: TextCorrectionBlock) {
-    selectBlock(block);
+// life cycle
+onMounted(() => {
+    registerHandler('JumpToBlockCommand', jumpToBlock);
+});
 
-    const blockElement = document.getElementById(`block-${block.offset}`);
+onUnmounted(() => {
+    unregisterHandler('JumpToBlockCommand', jumpToBlock);
+});
+
+// functions
+async function jumpToBlock(command: JumpToBlockCommand) {
+    selectBlock(command.block);
+
+    const blockElement = document.getElementById(`block-${command.block.offset}`);
     if (blockElement) {
         scrollToBlock(blockElement);
     }
@@ -56,7 +58,7 @@ function scrollToBlock(blockElement: HTMLElement) {
 }
 
 function applyBlock(block: TextCorrectionBlock, corrected: string) {
-    emit('blockApplied', block, corrected);
+    executeCommand(new ApplyCorrectionCommand(block, corrected));
 }
 </script>
 

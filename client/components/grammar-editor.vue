@@ -2,15 +2,14 @@
 import type { TextCorrectionBlock, TextCorrectionResponse } from '~/assets/models/text-correction';
 import type { Range } from '@tiptap/vue-3';
 import TextEditor from './text-editor.vue';
-import type { ProblemsPanel } from '#components';
+import ToolPanel from './tool-panel.vue';
+import { JumpToBlockCommand, RewriteTextCommand } from '~/assets/models/commands';
 
-// refts
-const inputText = ref('');
+// refs
+const userText = ref('');
 const blocks = ref<TextCorrectionBlock[]>([]);
 
 const error = ref<Error | null>(null);
-const textEditor = ref<InstanceType<typeof TextEditor>>();
-const correctionPanel = ref<InstanceType<typeof ProblemsPanel>>();
 const rewriteRange = ref<Range>();
 
 let currentCorrectTextAbortController: AbortController | null = null;
@@ -19,6 +18,7 @@ let currentCorrectTextAbortController: AbortController | null = null;
 const router = useRouter();
 const { addProgress, removeProgress } = useUseProgressIndication();
 const { t } = useI18n();
+const { executeCommand } = useCommandBus();
 
 // check if the query param clipboard is true
 const clipboard = router.currentRoute.value.query.clipboard;
@@ -28,14 +28,14 @@ onMounted(async () => {
     // Wait for next tick to ensure text editor is fully mounted
     await nextTick();
 
-    if (clipboard && inputText.value == '') {
+    if (clipboard && userText.value == '') {
         const text = await navigator.clipboard.readText();
-        inputText.value = text;
+        userText.value = text;
     }
 });
 
 // listeners
-watch(inputText, () => {
+watch(userText, () => {
     correctText();
     rewriteRange.value = undefined;
 });
@@ -57,7 +57,7 @@ async function correctText() {
     try {
         error.value = null;
         const response = await $fetch<TextCorrectionResponse>('/api/correct', {
-            body: { text: inputText.value },
+            body: { text: userText.value },
 
             method: 'POST',
             signal: currentCorrectTextAbortController.signal
@@ -75,25 +75,16 @@ async function correctText() {
     }
 }
 
-function applyBlock(block: TextCorrectionBlock, corrected: string) {
-    textEditor.value?.applyCorrection(block, corrected);
-}
-
 function onCorrectionApplied(block: TextCorrectionBlock, corrected: string) {
     blocks.value = blocks.value.filter(b => b.offset !== block.offset);
 }
 
 function onRewriteText(text: string, range: Range) {
-    rewriteRange.value = range;
+    executeCommand(new RewriteTextCommand(text, range));
 }
 
 function onBlockClick(block: TextCorrectionBlock) {
-    correctionPanel.value?.jumpToBlock(block);
-}
-
-function applyRewrite(option: string) {
-    if (!textEditor.value || !rewriteRange.value) return;
-    textEditor.value.applyText(option, rewriteRange.value);
+    executeCommand(new JumpToBlockCommand(block));
 }
 </script>
 
@@ -103,15 +94,13 @@ function applyRewrite(option: string) {
         <div class="flex gap-4 w-full">
             <div class="w-3/4 h-[90vh]">
                 <client-only>
-                    <TextEditor ref="textEditor" v-model="inputText" :blocks="blocks" @block-click="onBlockClick"
+                    <TextEditor v-model="userText" :blocks="blocks" @block-click="onBlockClick"
                         @rewrite-text="onRewriteText" @correction-applied="onCorrectionApplied" />
                 </client-only>
             </div>
 
             <div class="w-1/4 flex flex-col gap-2">
-                <RewriteView v-if="rewriteRange" :range="rewriteRange" :text="inputText"
-                    @rewrite-applied="applyRewrite" />
-                <ProblemsPanel ref="correctionPanel" :blocks="blocks" @block-applied="applyBlock" />
+                <ToolPanel :blocks="blocks" :text="userText" />
             </div>
         </div>
     </div>

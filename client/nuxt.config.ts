@@ -5,7 +5,7 @@ export default defineNuxtConfig({
     colorMode: {
         preference: 'light',
     },
-    modules: ['@nuxt/ui', '@nuxtjs/i18n', '@vite-pwa/nuxt'],
+    modules: ['@nuxt/ui', '@nuxtjs/i18n', '@vite-pwa/nuxt', '@nuxtjs/mdc'],
     css: ['~/assets/css/main.scss'],
     postcss: {
         plugins: {
@@ -20,7 +20,10 @@ export default defineNuxtConfig({
         }
     },
     i18n: {
-        vueI18n: './i18n.config.ts'
+        locales: ['en', 'de'],
+        defaultLocale: 'de',
+        vueI18n: './i18n.config.ts',
+        lazy: true,
     },
     pwa: {
         registerType: 'autoUpdate',
