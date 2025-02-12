@@ -1,24 +1,18 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     compatibilityDate: '2024-11-01',
-    devtools: { enabled: true },
+    devtools: { enabled: false },
     colorMode: {
         preference: 'light',
     },
     modules: ['@nuxt/ui', '@nuxtjs/i18n', '@vite-pwa/nuxt', '@nuxtjs/mdc'],
     css: ['~/assets/css/main.scss'],
-    postcss: {
-        plugins: {
-            tailwindcss: {},
-            autoprefixer: {},
-        },
-    },
     runtimeConfig: {
-        // Public keys that are exposed to the client
         public: {
             apiUrl: process.env.API_URL,
         }
     },
+    // localization
     i18n: {
         locales: ['en', 'de'],
         defaultLocale: 'de',
@@ -26,20 +20,24 @@ export default defineNuxtConfig({
         lazy: true,
     },
     nitro: {
-        serveStatic: true,
         node: true,
+        prerender: {
+            routes: ['/']
+        }
     },
     pwa: {
         registerType: 'autoUpdate',
+        workbox: {
+            globPatterns: ['**/*.{js,css,html,png,jpg,jpeg,svg}'],
+            globIgnores: ['dev-sw-dist/**/*'],
+            navigateFallback: '/',
+        },
         client: {
             periodicSyncForUpdates: 60 * 10, // 10 minutes
         },
-        devOptions: {
-            enabled: true,
-        },
         manifest: {
-            name: 'Grammar Editor',
-            short_name: 'Grammar Editor',
+            name: 'Grammar BS',
+            short_name: 'Grammar BS',
             description: 'Grammar Editor',
             theme_color: '#000000',
             background_color: '#000000',
@@ -58,5 +56,13 @@ export default defineNuxtConfig({
                 },
             ],
         },
+    },
+    $development: {
+        pwa: {
+            devOptions: {
+                enabled: true,
+            },
+        },
+        devtools: { enabled: true },
     }
 })

@@ -6,6 +6,8 @@ function Load-EnvFile {
     if (Test-Path $envPath) {
         $content = Get-Content $envPath
 
+        # First pass: Load all variables into a hashtable
+        $envVars = @{}
         foreach ($line in $content) {
             if ($line.Trim() -and !$line.StartsWith("#")) {
                 $key, $value = $line.Split('=', 2)
@@ -14,14 +16,27 @@ function Load-EnvFile {
                     $value = $value.Trim()
                     # Remove surrounding quotes if they exist
                     $value = $value -replace '^["'']|["'']$'
-
-                    # Set the environment variable
-                    [Environment]::SetEnvironmentVariable($key, $value, 'Process')
-                    Write-Host "Loaded $key"
+                    $envVars[$key] = $value
                 }
             }
         }
-    } else {
+
+        # Second pass: Resolve variables and set environment variables
+        foreach ($key in $envVars.Keys) {
+            $value = $envVars[$key]
+
+            # Resolve variables in the value
+            $resolvedValue = $value
+            foreach ($envKey in $envVars.Keys) {
+                $resolvedValue = $resolvedValue -replace "\$\{$envKey\}", $envVars[$envKey]
+            }
+
+            # Set the environment variable
+            [Environment]::SetEnvironmentVariable($key, $resolvedValue, 'Process')
+            Write-Host "Loaded $key"
+        }
+    }
+    else {
         Write-Warning "Environment file not found at: $envPath"
     }
 }

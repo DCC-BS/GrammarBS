@@ -1,11 +1,11 @@
 # Stage 1: Build the application
-FROM node:18-alpine AS build
+FROM node:23-alpine AS build
 
 # Install bun
 RUN npm install -g bun
 
 # Set the working directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Copy package.json and package-lock.json
 COPY ./package*.json ./
@@ -17,22 +17,20 @@ RUN bun install
 COPY . .
 
 # Build the application
-RUN bun run build
+RUN bun x nuxi prepare
+RUN bun x nuxi build
 
 # Stage 2: Run the application
-FROM node:18-alpine
-
-# Install bun
-RUN npm install -g bun
+FROM node:23-alpine
 
 # Set the working directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Copy the built application from the build stage
-COPY --from=build /usr/src/app/.output ./
+COPY --from=build /app/.output ./
 
 # Expose the port the app runs on
 EXPOSE 3000
 
 # Start the application
-CMD ["node", "./server/index.mjs"]
+ENTRYPOINT ["node", "./server/index.mjs"]

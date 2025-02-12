@@ -13,6 +13,7 @@ const props = defineProps<AdvisorViewProps>();
 const { t } = useI18n();
 const { addProgress, removeProgress } = useUseProgressIndication();
 const isLoading = ref(false);
+const { sendError } = useUseErrorDialog();
 
 const advisorData = ref<AdvisorResponse>();
 
@@ -33,9 +34,8 @@ async function giveAdvice() {
         };
 
         advisorData.value = await $fetch<AdvisorResponse>('/api/advice', { body, method: 'POST' });
-    } catch (e) {
-        console.log(e);
-        // ToDO handle error
+    } catch (e: any) {
+        sendError(e.message);
     } finally {
         removeProgress('advice');
         isLoading.value = false;

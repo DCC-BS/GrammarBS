@@ -14,10 +14,10 @@ const props = defineProps<RewriteViewProps>();
 const { t } = useI18n();
 const { addProgress, removeProgress } = useUseProgressIndication();
 const { registerHandler, unregisterHandler, executeCommand } = useCommandBus();
+const { sendError } = useUseErrorDialog();
 
 // refs
 const rewriteOptions = ref<RewriteApplyOptions>();
-const error = ref<Error | null>(null);
 
 const lastRange = ref<Range>();
 const lastText = ref<string>();
@@ -60,7 +60,7 @@ async function rewriteText(text: string, range: Range) {
         icon: 'i-heroicons-pencil',
         title: t('status.rewritingText')
     });
-    error.value = null;
+
     try {
         const body = {
             text: textToRewrite,
@@ -71,8 +71,8 @@ async function rewriteText(text: string, range: Range) {
 
         const response = await $fetch<TextRewriteResponse>('/api/rewrite', { body, method: 'POST' });
         rewriteOptions.value = { from, to, options: response.options };
-    } catch (e) {
-        error.value = e as Error;
+    } catch (e: any) {
+        sendError(e.message);
     } finally {
         removeProgress('rewriting');
     }
@@ -96,9 +96,6 @@ function applyRewrite(option: string) {
         {{ t('rewrite.noRewrite') }}
     </div>
     <div v-else>
-
-        <UAlert v-if="error" color="red" variant="solid" title="Error" :description="error.message" />
-
         <div v-if="rewriteOptions && rewriteOptions.options.length > 0">
             <div v-for="option in rewriteOptions.options">
                 <div v-html="option.replace(/\n/g, '<br>')"></div>

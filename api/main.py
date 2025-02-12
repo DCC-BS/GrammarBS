@@ -4,14 +4,14 @@ from pydantic import BaseModel
 
 from models.text_corretion_models import CorrectionResult, TextCorrectionOptions
 from models.text_rewrite_models import RewriteResult, TextRewriteOptions
+from services.advisor import AdvisorOutput, AdvisorService
 from services.rewrite_text import TextRewriteService
 from services.text_correction_language_tool import TextCorrectionService
-from services.advisor import AdvisorOutput, AdvisorService
+from utils.either import Either
 
 app = FastAPI()
 
 # Configure CORS
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],  # Nuxt.js default port
@@ -50,7 +50,7 @@ class RewritePrompt(BaseModel):
 def rewrite_text(data: RewritePrompt) -> RewriteResult:
     options = TextRewriteOptions(domain=data.domain, formality=data.formality)
 
-    result = text_rewrite_service.rewrite_text(data.text, data.context, options)
+    result: Either[str, RewriteResult] = text_rewrite_service.rewrite_text(data.text, data.context, options)
 
     if result.is_left():
         raise HTTPException(status_code=400, detail=result.left())

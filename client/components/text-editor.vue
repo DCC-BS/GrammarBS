@@ -172,7 +172,7 @@ async function applyText(command: ApplyTextCommand) {
 </script>
 
 <template>
-    <div v-if="editor" class="w-full h-full">
+    <div v-if="editor" class="w-full h-full flex flex-col gap-2">
         <bubble-menu :editor="editor" :tippy-options="{ duration: 100 }">
             <div class="bubble-menu">
                 <div class="flex gap-1"
@@ -201,7 +201,7 @@ async function applyText(command: ApplyTextCommand) {
             </svg>
 
             {{ editor.storage.characterCount.characters() }} / {{ limit }} characters
-            <br>
+            <br class="hidden md:block" />
             {{ editor.storage.characterCount.words() }} words
         </div>
     </div>

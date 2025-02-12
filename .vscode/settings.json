@@ -12,7 +12,7 @@
     "editor.renderControlCharacters": true,
     "[python]": {
         "editor.formatOnSave": true,
-        "editor.defaultFormatter": "ms-python.python"
+        "editor.defaultFormatter": "charliermarsh.ruff"
     },
     "[typescript]": {
         "editor.formatOnSave": true,
@@ -27,8 +27,4 @@
     "python.analysis.extraPaths": [
         "${workspaceFolder}/api"
     ],
-    "basedpyright.analysis.extraPaths": [
-        "${workspaceFolder}/api"
-    ],
-    "basedpyright.analysis.typeCheckingMode": "basic"
 }

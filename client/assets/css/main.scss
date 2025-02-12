@@ -13,10 +13,6 @@
 .ProseMirror {
     @apply caret-black dark:caret-white outline-0 z-0 p-1 h-full;
 
-    &>* {
-        @apply mx-auto max-w-2xl;
-    }
-
     .selection {
         @apply inline;
     }
@@ -41,8 +37,4 @@
             @apply border-t-black/40 dark:border-t-white/40 w-full -top-[1.5em] max-w-2xl mx-auto left-0 right-0;
         }
     }
-}
-
-[data-theme='slash-command'] {
-    width: 1000vw;
 }

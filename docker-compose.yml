@@ -1,5 +1,6 @@
 services:
   languagetool:
+    hostname: languagetool
     build: ./docker/languagetool
     container_name: languagetool
     ports:
@@ -8,8 +9,11 @@ services:
       - langtool_languageModel=/ngrams # OPTIONAL: Using ngrams data
       - Java_Xms=512m
       - Java_Xmx=2g
+    networks:
+      - grammar-bs-network
 
   vllm_qwen25_32b:
+    hostname: vllm_qwen25_32b
     image: vllm/vllm-openai:v0.7.0
     container_name: vllm_qwen25_32b
     ports:
@@ -30,3 +34,9 @@ services:
       - ${HUGGING_FACE_CACHE_DIR}:/root/.cache/huggingface
     command: >
       --port 8000 --model Qwen/Qwen2.5-32B-Instruct-GPTQ-Int4 --quantization "gptq_marlin" --kv-cache-dtype "fp8_e5m2" --tool-call-parser "hermes" --max-model-len 16000 --max-num-batched-tokens 4096 --max-num-seqs 16 --enable-prefix-caching --enable-chunked-prefill --gpu-memory-utilization 0.9 --tensor-parallel-size 2
+    networks:
+      - grammar-bs-network
+
+networks:
+  grammar-bs-network:
+    external: true

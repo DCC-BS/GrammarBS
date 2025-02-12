@@ -48,24 +48,26 @@ async function handleRewriteText(command: RewriteTextCommand): Promise<void> {
 </script>
 
 <template>
-    <div>
-        <UTabs :items="items" v-model="selectedTab">
+    <div class="h-full">
+        <UTabs :items="items" v-model="selectedTab" class="h-full" :ui="{ wrapper: 'h-[30vh] md:h-[90vh]' }">
             <template #problems>
                 <ProblemsPanel :blocks="props.blocks" />
             </template>
             <template #rewrite>
-                <div class="grid grid-cols-2 mb-3 gap-2">
-                    <span>{{ t('rewrite.formalityLabel') }}</span>
-                    <SelectMenuLocalized v-model="formality" :options="['neutral', 'formal', 'informal']"
-                        local-parent="rewrite.formality" />
+                <div class="overflow-y-auto h-full">
+                    <div class="grid grid-cols-2 mb-3 gap-2">
+                        <span>{{ t('rewrite.formalityLabel') }}</span>
+                        <SelectMenuLocalized v-model="formality" :options="['neutral', 'formal', 'informal']"
+                            local-parent="rewrite.formality" />
 
-                    <span>{{ t('rewrite.domainLabel') }}</span>
-                    <SelectMenuLocalized v-model="domain"
-                        :options="['general', 'report', 'email', 'socialMedia', 'technical']"
-                        local-parent="rewrite.domain" />
+                        <span>{{ t('rewrite.domainLabel') }}</span>
+                        <SelectMenuLocalized v-model="domain"
+                            :options="['general', 'report', 'email', 'socialMedia', 'technical']"
+                            local-parent="rewrite.domain" />
+                    </div>
+
+                    <RewriteView :formality="formality" :domain="domain" />
                 </div>
-
-                <RewriteView :formality="formality" :domain="domain" />
             </template>
             <template #advisor>
                 <div class="grid grid-cols-2 mb-3 gap-2">

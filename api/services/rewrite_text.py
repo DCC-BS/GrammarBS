@@ -1,7 +1,6 @@
-# type: ignore
 from typing import List, final
 
-import dspy
+import dspy  # type: ignore
 
 from models.text_rewrite_models import RewriteResult, TextRewriteOptions
 from utils.configuration import config
@@ -49,7 +48,7 @@ class TextRewriteService:
         module = dspy.Predict(RewirteInfo)
         response = module(text=text, context=context, domain=options.domain, formality=options.formality)
 
-        options = response.options
-        options = list(map(lambda option: option.replace("<rewrite>", text).replace("ß", "ss"), options))
+        out_options: List[str] = response.options
+        out_options = list(map(lambda option: option.replace("<rewrite>", text).replace("ß", "ss"), out_options))
 
-        return right(RewriteResult(options=options))
+        return right(RewriteResult(options=out_options))

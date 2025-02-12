@@ -14,7 +14,6 @@ from utils.either import Either, right
 
 @final
 class TextCorrectionService:
-
     def correct_text(self, text: str, options: TextCorrectionOptions) -> Either[str, CorrectionResult]:
         """Corrects the input text based on given options.
         Returns Either[str, str] where:
@@ -29,19 +28,19 @@ class TextCorrectionService:
         )
 
         # parse response
-        print(response)
-
         language_tool_response = LanguageToolResponse(**response.json())
 
         # create correction blocks
         blocks = []
         for match in language_tool_response.matches:
-            blocks.append(CorrectionBlock(
-                original=match.context.text[match.context.offset:match.context.offset + match.context.length],
-                corrected=list(map(lambda replacement: replacement.value, match.replacements)),
-                explanation=match.message,
-                offset=match.offset,
-                length=match.length
-            ))
+            blocks.append(
+                CorrectionBlock(
+                    original=match.context.text[match.context.offset : match.context.offset + match.context.length],
+                    corrected=list(map(lambda replacement: replacement.value, match.replacements)),
+                    explanation=match.message,
+                    offset=match.offset,
+                    length=match.length,
+                )
+            )
 
         return right(CorrectionResult(blocks=blocks, original=text))

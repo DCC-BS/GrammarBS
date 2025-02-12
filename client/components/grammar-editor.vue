@@ -9,7 +9,6 @@ import { JumpToBlockCommand, RewriteTextCommand } from '~/assets/models/commands
 const userText = ref('');
 const blocks = ref<TextCorrectionBlock[]>([]);
 
-const error = ref<Error | null>(null);
 const rewriteRange = ref<Range>();
 
 let currentCorrectTextAbortController: AbortController | null = null;
@@ -19,6 +18,7 @@ const router = useRouter();
 const { addProgress, removeProgress } = useUseProgressIndication();
 const { t } = useI18n();
 const { executeCommand } = useCommandBus();
+const { sendError } = useUseErrorDialog();
 
 // check if the query param clipboard is true
 const clipboard = router.currentRoute.value.query.clipboard;
@@ -55,7 +55,6 @@ async function correctText() {
         title: t('status.correctingText')
     });
     try {
-        error.value = null;
         const response = await $fetch<TextCorrectionResponse>('/api/correct', {
             body: { text: userText.value },
 
@@ -68,7 +67,7 @@ async function correctText() {
             return;
         }
 
-        error.value = e as Error;
+        sendError(e.message);
     } finally {
         currentCorrectTextAbortController = null;
         removeProgress('correcting');
@@ -89,17 +88,16 @@ function onBlockClick(block: TextCorrectionBlock) {
 </script>
 
 <template>
-    <div class="m-2">
-        <UAlert v-if="error" color="red" variant="solid" title="Error" :description="error.message" />
-        <div class="flex gap-4 w-full">
-            <div class="w-3/4 h-[90vh]">
+    <div>
+        <div class="flex flex-col md:flex-row w-full h-[100vh]">
+            <div class="w-full h-[60vh] p-2 md:w-[75%] md:h-[90vh]">
                 <client-only>
                     <TextEditor v-model="userText" :blocks="blocks" @block-click="onBlockClick"
                         @rewrite-text="onRewriteText" @correction-applied="onCorrectionApplied" />
                 </client-only>
             </div>
 
-            <div class="w-1/4 flex flex-col gap-2">
+            <div class="w-full h-[40vh] overflow-y-hidden md:w-[25%] p-2 md:h-full flex flex-col gap-2">
                 <ToolPanel :blocks="blocks" :text="userText" />
             </div>
         </div>
