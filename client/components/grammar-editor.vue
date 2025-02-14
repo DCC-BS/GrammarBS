@@ -4,10 +4,12 @@ import type { Range } from '@tiptap/vue-3';
 import TextEditor from './text-editor.vue';
 import ToolPanel from './tool-panel.vue';
 import { JumpToBlockCommand, RewriteTextCommand } from '~/assets/models/commands';
+import { TaskScheduler } from '~/assets/services/TaskScheduler';
 
 // refs
 const userText = ref('');
 const blocks = ref<TextCorrectionBlock[]>([]);
+const taskScheduler = new TaskScheduler();
 
 const rewriteRange = ref<Range>();
 
@@ -35,35 +37,31 @@ onMounted(async () => {
 });
 
 // listeners
-watch(userText, () => {
-    correctText();
+watch(userText, (newText) => {
+    taskScheduler.enqueue((signal) => correctText(newText, signal));
     rewriteRange.value = undefined;
+
+    // ends with any whitespace
+    if (newText.endsWith(' ') || newText.endsWith('\n')) {
+        taskScheduler.runLast();
+    }
 });
 
 // functions
-async function correctText() {
-    // Cancel any ongoing request
-    if (currentCorrectTextAbortController) {
-        currentCorrectTextAbortController.abort("aborded");
-    }
-
-    // Create new abort controller for this request
-    currentCorrectTextAbortController = new AbortController();
-
+async function correctText(text: string, signal: AbortSignal) {
     addProgress('correcting', {
         icon: 'i-heroicons-pencil',
         title: t('status.correctingText')
     });
     try {
         const response = await $fetch<TextCorrectionResponse>('/api/correct', {
-            body: { text: userText.value },
-
+            body: { text: text },
             method: 'POST',
-            signal: currentCorrectTextAbortController.signal
+            signal: signal
         });
         blocks.value = response.blocks;
     } catch (e: any) {
-        if ("cause" in e && e.cause == "aborded") {
+        if ("cause" in e && e.cause == "aborted") {
             return;
         }
 
