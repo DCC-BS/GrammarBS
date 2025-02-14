@@ -12,5 +12,6 @@ docker run `
     --env "OPENAI_API_KEY=${env:OPENAI_API_KEY}" `
     --env "LLM_MODEL=${env:LLM_MODEL}" `
     --env "LANGUAGE_TOOL_API_URL=http://languagetool:${env:LANGUAGE_TOOL_PORT}/v2" `
+    --env "CLIENT_URL=${env:CLIENT_URL}" `
     --network grammar-bs-network `
     grammar-bs-api

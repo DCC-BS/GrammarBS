@@ -7,6 +7,7 @@ from models.text_rewrite_models import RewriteResult, TextRewriteOptions
 from services.advisor import AdvisorOutput, AdvisorService
 from services.rewrite_text import TextRewriteService
 from services.text_correction_language_tool import TextCorrectionService
+from utils.configuration import config
 from utils.either import Either
 
 app = FastAPI()
@@ -14,7 +15,7 @@ app = FastAPI()
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Nuxt.js default port
+    allow_origins=[config.client_url],  # Nuxt.js default port
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -25,12 +26,12 @@ text_rewrite_service = TextRewriteService()
 advisor_service = AdvisorService()
 
 
-class ChatPrompt(BaseModel):
+class CorrectionInput(BaseModel):
     text: str
 
 
 @app.post("/text-correction")
-def chat_completions(text: ChatPrompt) -> CorrectionResult:
+def chat_completions(text: CorrectionInput) -> CorrectionResult:
     result = text_correction_service.correct_text(text.text, TextCorrectionOptions())
 
     if result.is_left():
@@ -39,7 +40,7 @@ def chat_completions(text: ChatPrompt) -> CorrectionResult:
     return result.right()
 
 
-class RewritePrompt(BaseModel):
+class RewriteInput(BaseModel):
     text: str
     context: str
     domain: str = "general"
@@ -47,7 +48,7 @@ class RewritePrompt(BaseModel):
 
 
 @app.post("/text-rewrite")
-def rewrite_text(data: RewritePrompt) -> RewriteResult:
+def rewrite_text(data: RewriteInput) -> RewriteResult:
     options = TextRewriteOptions(domain=data.domain, formality=data.formality)
 
     result: Either[str, RewriteResult] = text_rewrite_service.rewrite_text(data.text, data.context, options)
@@ -58,14 +59,14 @@ def rewrite_text(data: RewritePrompt) -> RewriteResult:
     return result.right()
 
 
-class AdvisorPrompt(BaseModel):
+class AdvisorInput(BaseModel):
     text: str
     domain: str = "general"
     formality: str = "neutral"
 
 
 @app.post("/advisor")
-def advisor(data: AdvisorPrompt) -> AdvisorOutput:
+def advisor(data: AdvisorInput) -> AdvisorOutput:
     options = TextRewriteOptions(domain=data.domain, formality=data.formality)
 
     result = advisor_service.advise_changes(data.text, options)
