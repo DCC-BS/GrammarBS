@@ -49,12 +49,13 @@ async function handleRewriteText(command: RewriteTextCommand): Promise<void> {
 
 <template>
     <div class="h-full">
-        <UTabs :items="items" v-model="selectedTab" class="h-full" :ui="{ wrapper: 'h-[30vh] md:h-[90vh]' }">
+        <UTabs :items="items" v-model="selectedTab" class="h-full"
+            :ui="{ container: 'h-[30vh] md:h-[90vh] overflow-y-auto scrollable-container', wrapper: 'h-[30vh] md:h-[90vh]' }">
             <template #problems>
                 <ProblemsPanel :blocks="props.blocks" />
             </template>
             <template #rewrite>
-                <div class="overflow-y-auto h-full">
+                <div class="h-full">
                     <div class="grid grid-cols-2 mb-3 gap-2">
                         <span>{{ t('rewrite.formalityLabel') }}</span>
                         <SelectMenuLocalized v-model="formality" :options="['neutral', 'formal', 'informal']"

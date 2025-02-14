@@ -44,17 +44,27 @@ function selectBlock(block: TextCorrectionBlock) {
 }
 
 function scrollToBlock(blockElement: HTMLElement) {
-    // Get the scrollable container
-    const container = blockElement.closest('.scrollable-container');
+    const container = blockElement.closest('.scrollable-container') as HTMLElement;
     if (!container) return;
 
-    // Calculate the scroll position
     const containerRect = container.getBoundingClientRect();
     const elementRect = blockElement.getBoundingClientRect();
-    const relativeTop = elementRect.top - containerRect.top;
+    const relativeTop = elementRect.top - containerRect.top + container.scrollTop;
+    const centerOffset = (containerRect.height - elementRect.height) / 2;
 
-    // Scroll the container
-    container.scrollTop = container.scrollTop + relativeTop - (containerRect.height / 2) + (elementRect.height / 2);
+    const targetScrollTop = relativeTop - centerOffset;
+
+    container.scrollTo({
+        top: targetScrollTop,
+        behavior: 'smooth'
+    });
+
+    // Fallback for browsers that don't support smooth scrolling
+    if (!('scrollBehavior' in document.documentElement.style)) {
+        container.scrollTop = targetScrollTop;
+    }
+
+    console.log('Scrolling to:', targetScrollTop);
 }
 
 function applyBlock(block: TextCorrectionBlock, corrected: string) {
@@ -65,7 +75,7 @@ function applyBlock(block: TextCorrectionBlock, corrected: string) {
 <template>
     <div v-if="blocks.length > 0">
         <div class="text-lg">{{ t('problems.title') }}</div>
-        <div class="overflow-y-scroll h-[90vh] scrollable-container">
+        <div>
             <template v-for="block in blocks">
                 <UCard :id="`block-${block.offset}`" class="m-2">
                     <div @click="selectBlock(block)">
