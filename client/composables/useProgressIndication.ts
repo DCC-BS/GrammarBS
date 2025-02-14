@@ -1,3 +1,6 @@
+/**
+ * Represents the progress of an editor operation.
+ */
 export type EditoreProgress = {
     icon: string;
     title: string;
@@ -5,6 +8,11 @@ export type EditoreProgress = {
 
 const activeProgresDict = ref<Record<string, EditoreProgress>>({});
 
+/**
+ * Provides methods to manage progress indications.
+ *
+ * @returns An object containing methods to add and remove progress indications, and the active progress dictionary.
+ */
 export const useUseProgressIndication = () => {
     return {
         addProgress,
@@ -13,6 +21,13 @@ export const useUseProgressIndication = () => {
     }
 }
 
+/**
+ * Adds a progress indication.
+ *
+ * @param key - The key to identify the progress indication.
+ * @param progress - The progress indication to add.
+ * @returns A function to remove the added progress indication.
+ */
 const addProgress = (key: string, progress: EditoreProgress) => {
     activeProgresDict.value[key] = progress;
 
@@ -21,6 +36,11 @@ const addProgress = (key: string, progress: EditoreProgress) => {
     }
 }
 
+/**
+ * Removes a progress indication.
+ *
+ * @param key - The key to identify the progress indication to remove.
+ */
 const removeProgress = (key: string) => {
     delete activeProgresDict.value[key];
 }

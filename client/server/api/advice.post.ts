@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
 
     const body = await readBody(event);
 
-    const response = await fetch(`${config.public.apiUrl}/advisor`, {
+    const response = await $fetch(`${config.public.apiUrl}/advisor`, {
         method: 'POST',
         body: JSON.stringify(body),
         headers: {
@@ -11,5 +11,5 @@ export default defineEventHandler(async (event) => {
         }
     });
 
-    return await response.json();
+    return response;
 });

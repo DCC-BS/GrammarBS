@@ -8,9 +8,17 @@ type CorrectionMarkOptions = {
     active: boolean,
 }
 
+/**
+ * CorrectionMark is a custom mark for the Tiptap editor that highlights text corrections.
+ * It provides options for handling click events and toggling active state.
+ */
 export const CorrectionMark = Mark.create<CorrectionMarkOptions>({
     name: 'correction',
 
+    /**
+     * Adds default options for the CorrectionMark.
+     * @returns {CorrectionMarkOptions} The default options.
+     */
     addOptions() {
         return {
             onClick: () => { },
@@ -18,6 +26,10 @@ export const CorrectionMark = Mark.create<CorrectionMarkOptions>({
         }
     },
 
+    /**
+     * Specifies how the CorrectionMark should be parsed from HTML.
+     * @returns {Array} The HTML parsing rules.
+     */
     parseHTML() {
         return [
             {
@@ -26,11 +38,20 @@ export const CorrectionMark = Mark.create<CorrectionMarkOptions>({
         ]
     },
 
+    /**
+     * Specifies how the CorrectionMark should be rendered to HTML.
+     * @param {Object} HTMLAttributes - The HTML attributes to be merged.
+     * @returns {Array} The HTML rendering rules.
+     */
     renderHTML({ HTMLAttributes }) {
         const classNames = this.options.active ? 'correction active' : 'correction';
         return ['span', mergeAttributes({ class: classNames }, HTMLAttributes), 0]
     },
 
+    /**
+     * Adds custom attributes to the CorrectionMark.
+     * @returns {Object} The custom attributes.
+     */
     addAttributes() {
         return {
             'data-block-id': {
@@ -46,10 +67,21 @@ export const CorrectionMark = Mark.create<CorrectionMarkOptions>({
         }
     },
 
+    /**
+     * Adds ProseMirror plugins to handle custom behavior for the CorrectionMark.
+     * @returns {Array} The ProseMirror plugins.
+     */
     addProseMirrorPlugins() {
         return [
             new Plugin({
                 props: {
+                    /**
+                     * Handles click events on the CorrectionMark.
+                     * @param {EditorView} view - The editor view.
+                     * @param {number} pos - The position of the click.
+                     * @param {MouseEvent} event - The mouse event.
+                     * @returns {boolean} Whether the click was handled.
+                     */
                     handleClick: (view: EditorView, pos: number, event: MouseEvent) => {
                         const { state } = view;
                         const { doc, selection } = state;

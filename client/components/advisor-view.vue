@@ -41,7 +41,6 @@ async function giveAdvice() {
         isLoading.value = false;
     }
 }
-
 </script>
 
 <template>
