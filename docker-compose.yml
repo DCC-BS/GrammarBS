@@ -11,6 +11,8 @@ services:
       - Java_Xmx=2g
     networks:
       - grammar-bs-network
+    volumes:
+      - ${LANGUAGE_TOOL_CACHE_DIR}:/ngrams
 
   vllm_qwen25_32b:
     hostname: vllm_qwen25_32b

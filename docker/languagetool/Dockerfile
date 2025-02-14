@@ -1,4 +1,4 @@
-FROM alpine:3.20.3 as build
+FROM erikvl87/languagetool
 
 # Switch to root user to perform operations
 USER root
@@ -17,21 +17,13 @@ RUN mkdir -p /ngrams
 COPY download_ngrams.sh /usr/local/bin/download_ngrams.sh
 RUN chmod +x /usr/local/bin/download_ngrams.sh
 
-# Download and extract n-gram datasets if not present
-RUN /bin/bash -c 'source /usr/local/bin/download_ngrams.sh && download_ngrams de' \
-    && /bin/bash -c 'source /usr/local/bin/download_ngrams.sh && download_ngrams en' \
-    && /bin/bash -c 'source /usr/local/bin/download_ngrams.sh && download_ngrams fr'
-
-FROM erikvl87/languagetool as final
-
-# Switch to root user to perform operations
-USER root
-
-# Copy the n-gram datasets from the build image
-COPY --from=build /ngrams /ngrams
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Switch back to the languagetool user
 USER languagetool
 
 # Set the languageModel configuration to use the n-grams
 ENV langtool_languageModel=/ngrams
+
+ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
