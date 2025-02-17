@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { Range } from '@tiptap/vue-3';
-import { ApplyTextCommand, RewriteTextCommand } from '~/assets/models/commands';
+import { ApplyTextCommand, Cmds, RewriteTextCommand } from '~/assets/models/commands';
 import type { RewriteApplyOptions, TextRewriteResponse } from '~/assets/models/text-rewrite';
 
 interface RewriteViewProps {
@@ -24,11 +24,11 @@ const lastText = ref<string>();
 
 // life cycle
 onMounted(() => {
-    registerHandler('RewriteTextCommand', handleCommand);
+    registerHandler(Cmds.RewriteTextCommand, handleCommand);
 });
 
 onUnmounted(() => {
-    unregisterHandler('RewriteTextCommand', handleCommand);
+    unregisterHandler(Cmds.RewriteTextCommand, handleCommand);
 });
 
 // listeners

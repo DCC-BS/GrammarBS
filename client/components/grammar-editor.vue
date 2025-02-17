@@ -38,7 +38,7 @@ onMounted(async () => {
 
 // listeners
 watch(userText, (newText) => {
-    taskScheduler.enqueue((signal) => correctText(newText, signal));
+    taskScheduler.enqueue((signal: AbortSignal) => correctText(newText, signal));
     rewriteRange.value = undefined;
 
     // ends with any whitespace

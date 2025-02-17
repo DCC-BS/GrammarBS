@@ -5,7 +5,7 @@ import type { TextCorrectionBlock } from '~/assets/models/text-correction'
 import type { Node } from '@tiptap/pm/model';
 import { CorrectionMark } from '~/utils/correction-mark';
 import CharacterCount from '@tiptap/extension-character-count'
-import { ApplyCorrectionCommand, ApplyTextCommand } from '~/assets/models/commands';
+import { ApplyCorrectionCommand, ApplyTextCommand, Cmds } from '~/assets/models/commands';
 
 // input
 const props = defineProps<{
@@ -90,15 +90,15 @@ const editor = useEditor({
 
 // lifecycle
 onMounted(() => {
-    registerHandler('ApplyCorrectionCommand', applyCorrection);
-    registerHandler('ApplyTextCommand', applyText);
+    registerHandler(Cmds.ApplyCorrectionCommand, applyCorrection);
+    registerHandler(Cmds.ApplyTextCommand, applyText);
 });
 
 onUnmounted(() => {
     editor.value?.destroy();
 
-    unregisterHandler('ApplyCorrectionCommand', applyCorrection);
-    unregisterHandler('ApplyTextCommand', applyText);
+    unregisterHandler(Cmds.ApplyCorrectionCommand, applyCorrection);
+    unregisterHandler(Cmds.ApplyTextCommand, applyText);
 });
 
 // listeners

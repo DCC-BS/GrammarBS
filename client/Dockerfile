@@ -9,6 +9,7 @@ WORKDIR /app
 
 # Copy package.json and package-lock.json
 COPY ./package*.json ./
+COPY ./.npmrc ./
 
 # Install dependencies using bun
 RUN bun install

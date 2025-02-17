@@ -5,7 +5,7 @@ export default defineNuxtConfig({
     colorMode: {
         preference: 'light',
     },
-    modules: ['@nuxt/ui', '@nuxtjs/i18n', '@vite-pwa/nuxt', '@nuxtjs/mdc'],
+    modules: ['@nuxt/ui', '@nuxtjs/i18n', '@vite-pwa/nuxt', '@nuxtjs/mdc', '@dcc-bs/event-system.bs.js'],
     css: ['~/assets/css/main.scss'],
     runtimeConfig: {
         public: {

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { UTabs } from '#components';
-import type { RewriteTextCommand } from '~/assets/models/commands';
+import { Cmds, type RewriteTextCommand } from '~/assets/models/commands';
 import type { TextCorrectionBlock } from '~/assets/models/text-correction';
 
 // definitions
@@ -21,11 +21,11 @@ const formality = ref<string>('neutral');
 const domain = ref<string>('general');
 
 onMounted(() => {
-    registerHandler('RewriteTextCommand', handleRewriteText);
+    registerHandler(Cmds.RewriteTextCommand, handleRewriteText);
 });
 
 onUnmounted(() => {
-    unregisterHandler('RewriteTextCommand', handleRewriteText);
+    unregisterHandler(Cmds.RewriteTextCommand, handleRewriteText);
 });
 
 const items = [{

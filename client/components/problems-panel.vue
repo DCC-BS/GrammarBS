@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ApplyCorrectionCommand, type JumpToBlockCommand } from '~/assets/models/commands';
+import { ApplyCorrectionCommand, Cmds, type JumpToBlockCommand } from '~/assets/models/commands';
 import type { TextCorrectionBlock } from '~/assets/models/text-correction';
 
 // definitions
@@ -22,11 +22,11 @@ const blocks = computed(() => props.blocks);
 
 // life cycle
 onMounted(() => {
-    registerHandler('JumpToBlockCommand', jumpToBlock);
+    registerHandler(Cmds.JumpToBlockCommand, jumpToBlock);
 });
 
 onUnmounted(() => {
-    unregisterHandler('JumpToBlockCommand', jumpToBlock);
+    unregisterHandler(Cmds.JumpToBlockCommand, jumpToBlock);
 });
 
 // functions
