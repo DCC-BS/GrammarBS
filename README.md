@@ -19,6 +19,8 @@ LANGUAGE_TOOL_PORT=8010
 LANGUAGE_TOOL_API_URL='http://localhost:${LANGUAGE_TOOL_PORT}/v2'
 LANGUAGE_TOOL_CACHE_DIR='C:/Users/[YOUR_USER]/.cache/languagetool'
 DEV=true
+
+GITHUB_TOKEN=[YOUR_PERSONAL_GITHUB_TOKEN]
 ```
 
 create the docker network:
