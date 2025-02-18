@@ -1,4 +1,5 @@
 version = 1
+revision = 1
 requires-python = ">=3.13"
 
 [[package]]
@@ -97,6 +98,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "dspy" },
     { name = "fastapi", extra = ["standard"] },
+    { name = "functional-monads-bs-py" },
     { name = "mypy" },
     { name = "openai" },
     { name = "python-dotenv" },
@@ -109,6 +111,7 @@ dependencies = [
 requires-dist = [
     { name = "dspy", specifier = ">=2.6.2" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.115.8" },
+    { name = "functional-monads-bs-py", git = "https://github.com/DCC-BS/functional-monads.bs.py" },
     { name = "mypy", specifier = ">=1.14.1" },
     { name = "openai", specifier = ">=1.61.0" },
     { name = "python-dotenv", specifier = ">=1.0.1" },
@@ -503,6 +506,11 @@ wheels = [
 http = [
     { name = "aiohttp" },
 ]
+
+[[package]]
+name = "functional-monads-bs-py"
+version = "0+untagged.5.gf991210"
+source = { git = "https://github.com/DCC-BS/functional-monads.bs.py#f99121017340d68885f636c799a5429521191d0e" }
 
 [[package]]
 name = "greenlet"

@@ -9,7 +9,7 @@ from models.text_corretion_models import (
     TextCorrectionOptions,
 )
 from utils.configuration import config
-from utils.either import Either, right
+from functional_monads.either import right, Either
 
 
 @final

@@ -1,10 +1,10 @@
 from typing import List, final
 
 import dspy  # type: ignore
+from functional_monads.either import Either, right
 
 from models.text_rewrite_models import RewriteResult, TextRewriteOptions
 from utils.configuration import config
-from utils.either import Either, right
 
 
 class RewirteInfo(dspy.Signature):

@@ -1,11 +1,11 @@
-from typing import List, final
+from typing import final
 
 import dspy  # type: ignore
+from functional_monads.either import Either, right
 from pydantic import BaseModel
 
 from models.text_rewrite_models import TextRewriteOptions
 from utils.configuration import config
-from utils.either import Either, right
 
 
 class ProposeChanges(dspy.Signature):

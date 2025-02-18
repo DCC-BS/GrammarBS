@@ -1,5 +1,8 @@
+from typing import Any
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from functional_monads.either import Either
 from pydantic import BaseModel
 
 from models.text_corretion_models import CorrectionResult, TextCorrectionOptions
@@ -8,7 +11,6 @@ from services.advisor import AdvisorOutput, AdvisorService
 from services.rewrite_text import TextRewriteService
 from services.text_correction_language_tool import TextCorrectionService
 from utils.configuration import config
-from utils.either import Either
 
 app = FastAPI()
 
@@ -26,6 +28,16 @@ text_rewrite_service = TextRewriteService()
 advisor_service = AdvisorService()
 
 
+def handle_result[T](result: Either[str, T]) -> T:
+    def handle_error(error: str) -> Any:
+        raise HTTPException(status_code=400, detail=error)
+
+    return result.fold(  # type: ignore
+        handle_error,
+        lambda value: value,
+    )
+
+
 class CorrectionInput(BaseModel):
     text: str
 
@@ -33,11 +45,7 @@ class CorrectionInput(BaseModel):
 @app.post("/text-correction")
 def chat_completions(text: CorrectionInput) -> CorrectionResult:
     result = text_correction_service.correct_text(text.text, TextCorrectionOptions())
-
-    if result.is_left():
-        raise HTTPException(status_code=400, detail=result.left())
-
-    return result.right()
+    return handle_result(result)
 
 
 class RewriteInput(BaseModel):
@@ -52,11 +60,7 @@ def rewrite_text(data: RewriteInput) -> RewriteResult:
     options = TextRewriteOptions(domain=data.domain, formality=data.formality)
 
     result: Either[str, RewriteResult] = text_rewrite_service.rewrite_text(data.text, data.context, options)
-
-    if result.is_left():
-        raise HTTPException(status_code=400, detail=result.left())
-
-    return result.right()
+    return handle_result(result)
 
 
 class AdvisorInput(BaseModel):
@@ -70,8 +74,4 @@ def advisor(data: AdvisorInput) -> AdvisorOutput:
     options = TextRewriteOptions(domain=data.domain, formality=data.formality)
 
     result = advisor_service.advise_changes(data.text, options)
-
-    if result.is_left():
-        raise HTTPException(status_code=400, detail=result.left())
-
-    return result.right()
+    return handle_result(result)

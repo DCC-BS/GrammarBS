@@ -10,7 +10,7 @@
         "postinstall": "nuxt prepare"
     },
     "dependencies": {
-        "@dcc-bs/event-system.bs.js": "1.0.2",
+        "@dcc-bs/event-system.bs.js": "^1.0.2",
         "@iconify-json/heroicons": "^1.2.2",
         "@nuxt/ui": "2.21.0",
         "@nuxtjs/i18n": "^9.1.5",

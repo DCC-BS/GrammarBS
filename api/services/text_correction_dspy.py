@@ -3,6 +3,7 @@
 from typing import final
 
 import dspy
+from functional_monads.either import Either, right
 from openai import OpenAI
 
 from models.text_corretion_models import (
@@ -11,7 +12,6 @@ from models.text_corretion_models import (
     TextCorrectionOptions,
 )
 from utils.configuration import config
-from utils.either import Either, right
 
 
 class SegmentInfo(dspy.Signature):
