@@ -84,7 +84,7 @@ function applyBlock(block: TextCorrectionBlock, corrected: string) {
 
                     <div v-if="selectedBlock == block">
                         <div class="flex gap-2 flex-wrap mt-1">
-                            <UButton v-for="corrected in block.corrected.slice(0, 5)"
+                            <UButton v-for="corrected in block.corrected"
                                 @click="applyBlock(block, corrected)">
                                 {{ corrected }}
                             </UButton>

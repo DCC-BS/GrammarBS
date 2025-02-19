@@ -1,6 +1,7 @@
 from typing import final
 
 import requests
+from functional_monads.either import Either, right
 
 from models.language_tool_models import LanguageToolResponse
 from models.text_corretion_models import (
@@ -9,7 +10,6 @@ from models.text_corretion_models import (
     TextCorrectionOptions,
 )
 from utils.configuration import config
-from functional_monads.either import right, Either
 
 
 @final

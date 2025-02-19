@@ -175,7 +175,7 @@ async function applyText(command: ApplyTextCommand) {
     <div v-if="editor" class="w-full h-full flex flex-col gap-2">
         <bubble-menu :editor="editor" :tippy-options="{ duration: 100 }">
             <div class="bubble-menu">
-                <div class="flex gap-1"
+                <div class="flex flex-wrap gap-1 justify-center"
                     v-if="editor.isActive('correction') && currentBlock && currentBlock.corrected.length > 0">
                     <UButton v-for="correction in currentBlock.corrected.slice(0, 5)" :key="correction"
                         @click="applyCorrection(new ApplyCorrectionCommand(currentBlock, correction))">
