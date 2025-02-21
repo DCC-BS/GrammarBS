@@ -10,6 +10,7 @@
         "postinstall": "nuxt prepare"
     },
     "dependencies": {
+        "@dcc-bs/common-ui.bs.js": "^0.1.1",
         "@dcc-bs/event-system.bs.js": "^1.0.2",
         "@iconify-json/heroicons": "^1.2.2",
         "@nuxt/ui": "2.21.0",
@@ -25,6 +26,7 @@
         "@tiptap/vue-3": "^2.11.5",
         "@vite-pwa/nuxt": "^0.10.6",
         "nuxt": "^3.15.4",
+        "nuxt-viewport": "2.2.0",
         "vue": "latest",
         "vue-router": "latest"
     },

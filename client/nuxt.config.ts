@@ -5,7 +5,15 @@ export default defineNuxtConfig({
     colorMode: {
         preference: 'light',
     },
-    modules: ['@nuxt/ui', '@nuxtjs/i18n', '@vite-pwa/nuxt', '@nuxtjs/mdc', '@dcc-bs/event-system.bs.js'],
+    modules: [
+        '@nuxt/ui',
+        '@nuxtjs/i18n',
+        '@vite-pwa/nuxt',
+        '@nuxtjs/mdc',
+        '@dcc-bs/event-system.bs.js',
+        '@dcc-bs/common-ui.bs.js',
+        'nuxt-viewport'
+    ],
     css: ['~/assets/css/main.scss'],
     runtimeConfig: {
         public: {
@@ -57,10 +65,27 @@ export default defineNuxtConfig({
             ],
         },
     },
+    viewport: {
+        breakpoints: {
+            xs: 320,
+            sm: 640,
+            md: 768,
+            lg: 1024,
+            xl: 1280,
+            '2xl': 1536,
+        },
+        defaultBreakpoints: {
+            desktop: 'lg',
+            mobile: 'xs',
+            tablet: 'md',
+        },
+
+        fallbackBreakpoint: 'lg'
+    },
     $development: {
         pwa: {
             devOptions: {
-                enabled: true,
+                enabled: false,
             },
         },
         devtools: { enabled: true },

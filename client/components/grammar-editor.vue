@@ -17,6 +17,7 @@ let currentCorrectTextAbortController: AbortController | null = null;
 
 // composables
 const router = useRouter();
+const viewport = useViewport();
 const { addProgress, removeProgress } = useUseProgressIndication();
 const { t } = useI18n();
 const { executeCommand } = useCommandBus();
@@ -83,22 +84,27 @@ function onRewriteText(text: string, range: Range) {
 function onBlockClick(block: TextCorrectionBlock) {
     executeCommand(new JumpToBlockCommand(block));
 }
+
+
+watch(viewport.breakpoint, (newBreakpoint, oldBreakpoint) => {
+    console.log('Breakpoint updated:', oldBreakpoint, '->', newBreakpoint)
+})
 </script>
 
 <template>
-    <div>
-        <div class="flex flex-col md:flex-row w-full h-[100vh]">
-            <div class="w-full h-[60vh] p-2 md:w-[75%] md:h-[90vh]">
+    <div class="h-[100vh]">
+        <SplitView :isHorizontal="viewport.isLessThan('md')" a-pane-style="min-w-[250px] min-h-[200px]"
+            b-pane-style="min-w-[300px] min-h-[200px]">
+            <template #a>
                 <client-only>
                     <TextEditor v-model="userText" :blocks="blocks" @block-click="onBlockClick"
                         @rewrite-text="onRewriteText" @correction-applied="onCorrectionApplied" />
                 </client-only>
-            </div>
-
-            <div class="w-full h-[40vh] overflow-y-hidden md:w-[25%] p-2 md:h-full flex flex-col gap-2">
+            </template>
+            <template #b>
                 <ToolPanel :blocks="blocks" :text="userText" />
-            </div>
-        </div>
+            </template>
+        </SplitView>
     </div>
     <div class="fixed bottom-5 left-0 right-0">
         <ProgressIndication />
