@@ -97,12 +97,16 @@ watch(viewport.breakpoint, (newBreakpoint, oldBreakpoint) => {
             b-pane-style="min-w-[300px] min-h-[200px]">
             <template #a>
                 <client-only>
-                    <TextEditor v-model="userText" :blocks="blocks" @block-click="onBlockClick"
-                        @rewrite-text="onRewriteText" @correction-applied="onCorrectionApplied" />
+                    <div class="w-full h-full relative">
+                        <TextEditor v-model="userText" :blocks="blocks" @block-click="onBlockClick"
+                            @rewrite-text="onRewriteText" @correction-applied="onCorrectionApplied" />
+                    </div>
                 </client-only>
             </template>
             <template #b>
-                <ToolPanel :blocks="blocks" :text="userText" />
+                <div>
+                    <ToolPanel :blocks="blocks" :text="userText" />
+                </div>
             </template>
         </SplitView>
     </div>

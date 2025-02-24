@@ -31,6 +31,8 @@ const limit = ref(10_000);
 const currentPosition = computed(() => editor.value?.state.selection.from ?? -1);
 const currentBlock = computed(() => props.blocks.find(b => b.offset + 1 == currentPosition.value));
 const characterCountPercentage = computed(() => Math.round((100 / limit.value) * editor.value?.storage.characterCount.characters()));
+const viewport = useViewport();
+
 
 // composables
 const toast = useToast();
@@ -81,7 +83,6 @@ const editor = useEditor({
                 }
             }
         },
-
     },
     onUpdate: ({ editor }) => {
         model.value = editor.getText()
@@ -172,7 +173,7 @@ async function applyText(command: ApplyTextCommand) {
 </script>
 
 <template>
-    <div v-if="editor" class="w-full h-full flex flex-col gap-2">
+    <div v-if="editor" class="w-full h-full flex flex-col gap-2 p-2 @container">
         <bubble-menu :editor="editor" :tippy-options="{ duration: 100 }">
             <div class="bubble-menu">
                 <div class="flex flex-wrap gap-1 justify-center"
@@ -190,19 +191,26 @@ async function applyText(command: ApplyTextCommand) {
         <div class="ring-1 ring-gray-400 w-full h-full overflow-y-scroll">
             <editor-content :editor="editor" spellcheck="false" class="w-full h-full"></editor-content>
         </div>
-        <div class="flex items-center gap-2 justify-end"
+        <div class="flex gap-2 items-start justify-between"
             :class="{ 'character-count--warning': editor.storage.characterCount.characters() === limit }">
-            <svg height="20" width="20" viewBox="0 0 20 20">
-                <circle r="10" cx="10" cy="10" fill="#e9ecef" />
-                <circle r="5" cx="10" cy="10" fill="transparent" stroke="currentColor" stroke-width="10"
-                    :stroke-dasharray="`calc(${characterCountPercentage} * 31.4 / 100) 31.4`"
-                    transform="rotate(-90) translate(-20)" />
-                <circle r="6" cx="10" cy="10" fill="white" />
-            </svg>
+            <DisclaimerLlm />
+            <div class="data-bs-banner">
+                <DataBsBanner class="text-center" />
+            </div>
 
-            {{ editor.storage.characterCount.characters() }} / {{ limit }} characters
-            <br class="hidden md:block" />
-            {{ editor.storage.characterCount.words() }} words
+            <div class="flex items-center gap-2">
+                <svg height="20" width="20" viewBox="0 0 20 20">
+                    <circle r="10" cx="10" cy="10" fill="#e9ecef" />
+                    <circle r="5" cx="10" cy="10" fill="transparent" stroke="currentColor" stroke-width="10"
+                        :stroke-dasharray="`calc(${characterCountPercentage} * 31.4 / 100) 31.4`"
+                        transform="rotate(-90) translate(-20)" />
+                    <circle r="6" cx="10" cy="10" fill="white" />
+                </svg>
+
+                {{ editor.storage.characterCount.characters() }} / {{ limit }} characters
+                <br class="hidden md:block" />
+                {{ editor.storage.characterCount.words() }} words
+            </div>
         </div>
     </div>
 </template>
@@ -223,5 +231,15 @@ async function applyText(command: ApplyTextCommand) {
 
 .character-count--warning {
     @apply text-red-500;
+}
+
+.data-bs-banner {
+    @apply hidden @md:inline max-md:hidden;
+}
+
+@media screen and (max-height: 600px) {
+    .data-bs-banner {
+        @apply hidden;
+    }
 }
 </style>

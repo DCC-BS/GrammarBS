@@ -48,7 +48,7 @@ async function handleRewriteText(command: RewriteTextCommand): Promise<void> {
 </script>
 
 <template>
-    <div class="h-full">
+    <div class="h-full p-2">
         <UTabs :items="items" v-model="selectedTab" class="h-full"
             :ui="{ container: 'h-[30vh] md:h-[90vh] overflow-y-auto scrollable-container', wrapper: 'h-[30vh] md:h-[90vh]' }">
             <template #problems>
