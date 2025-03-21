@@ -107,6 +107,11 @@ dependencies = [
     { name = "types-setuptools" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "version-pioneer" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "dspy", specifier = ">=2.6.2" },
@@ -119,6 +124,9 @@ requires-dist = [
     { name = "types-requests", specifier = ">=2.32.0.20241016" },
     { name = "types-setuptools", specifier = ">=75.8.0.20250110" },
 ]
+
+[package.metadata.requires-dev]
+dev = [{ name = "version-pioneer", specifier = ">=0.0.13" }]
 
 [[package]]
 name = "apscheduler"
@@ -1607,6 +1615,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/d2/19/f5b78616566ea68edd42aacaf645adbf71fbd83fc52281fba555dc27e3f1/uvloop-0.21.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f3df876acd7ec037a3d005b3ab85a7e4110422e4d9c1571d4fc89b0fc41b6816", size = 4701068 },
     { url = "https://files.pythonhosted.org/packages/47/57/66f061ee118f413cd22a656de622925097170b9380b30091b78ea0c6ea75/uvloop-0.21.0-cp313-cp313-musllinux_1_2_aarch64.whl", hash = "sha256:bd53ecc9a0f3d87ab847503c2e1552b690362e005ab54e8a48ba97da3924c0dc", size = 4454428 },
     { url = "https://files.pythonhosted.org/packages/63/9a/0962b05b308494e3202d3f794a6e85abe471fe3cafdbcf95c2e8c713aabd/uvloop-0.21.0-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:a5c39f217ab3c663dc699c04cbd50c13813e31d917642d459fdcec07555cc553", size = 4660018 },
+]
+
+[[package]]
+name = "version-pioneer"
+version = "0.0.13"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/61/56/aafde3e86876a3753b70988c3a6d07933ca83c5a9c75135f860ae04fd95e/version_pioneer-0.0.13.tar.gz", hash = "sha256:6d4a1c08f3ad88714d99ffc6b54faccf22cca26c1807388aedc3c063c3648b5f", size = 61611 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/83/d4/043a7c105fe01a287b03749dc7979db10c0ed77f6c5d0a6721644f312ba0/version_pioneer-0.0.13-py3-none-any.whl", hash = "sha256:c18c35836c17fe236eaa35eea8d4b26d67595e26bfbfbf6136e0ca0522d0195a", size = 48509 },
 ]
 
 [[package]]

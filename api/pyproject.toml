@@ -52,6 +52,11 @@ line-ending = "auto"
 [tool.uv.sources]
 functional-monads-bs-py = { git = "https://github.com/DCC-BS/functional-monads.bs.py" }
 
+[dependency-groups]
+dev = [
+    "version-pioneer>=0.0.13",
+]
+
 [tool.ruff.lint.isort]
 # Group imports by type (standard library, third-party, first-party).
 combine-as-imports = true

@@ -17,7 +17,7 @@ RUN mkdir -p /ngrams
 COPY download_ngrams.sh /usr/local/bin/download_ngrams.sh
 RUN chmod +x /usr/local/bin/download_ngrams.sh
 
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Switch back to the languagetool user
