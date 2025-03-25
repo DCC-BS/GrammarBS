@@ -1,5 +1,8 @@
 # GrammarBS
 
+This repository is deprecated. See https://github.com/DCC-BS/text-mate-frontend and https://github.com/DCC-BS/text-mate-backend
+
+---
 
 create an  .env file in the root of the project and add the following variables:
 
